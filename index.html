@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>项目经营资金助手 · 工作台</title>
+<style>
+:root{--ink:#1b2b3a;--ink2:#41525f;--muted:#76869a;--line:#e5eaf0;--line2:#eef2f6;--bg:#f3f5f8;--card:#fff;
+--blue:#2a64a3;--blue-bg:#eaf1f9;--teal:#1f8a5b;--green:#1f8a5b;--green-bg:#e8f5ee;
+--red:#cf4339;--red-bg:#fdf0ee;--orange:#c7861c;--orange-bg:#fdf5e7;--ref:#9aa8b6;--sim:#7550c4;--sim-bg:#f3effb;
+--shadow:0 1px 2px rgba(20,36,56,.05),0 2px 8px rgba(20,36,56,.04)}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#e4eefa 0,var(--bg) 420px) no-repeat,var(--bg);color:var(--ink);font:16px/1.6 "Microsoft YaHei","PingFang SC",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+h1,h2,h3,h4,h5,p{margin:0}
+a{text-decoration:none;color:inherit}
+header{background:rgba(255,255,255,.78);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--line);position:sticky;top:0;z-index:20}
+header .in{padding:12px 20px;display:flex;align-items:center;gap:12px}
+.sel{border:1px solid var(--line);border-radius:6px;background:#fff;padding:6px 10px;font-size:14px;color:var(--ink)}
+header time{font-size:14px;color:var(--muted)}
+.wrap{max-width:1400px;margin:0 auto;padding:12px 28px 40px}
+.view{display:none}.view.on{display:block}
+/* 通用卡片：静态卡无边框，可点卡有边框与悬停 */
+.pane,.cell,.todos,.sims,.how,.verdict,.classbar,.vcard,.dual-band,table{background:var(--card);border-radius:12px;box-shadow:var(--shadow)}
+.pool{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.cell{padding:18px 22px}
+.cell h4{font-size:14px;font-weight:400;color:var(--muted)}
+.cell strong{display:block;font-size:28px;font-weight:700;line-height:1.3;margin-top:4px}
+.cell strong em{font-size:14px;font-style:normal;font-weight:400;color:var(--muted);margin-left:4px}
+.cell .d{font-size:14px;color:var(--muted);margin-top:2px}
+.cell.warn strong{color:var(--orange)}
+.cell.bad strong{color:var(--red)}
+.cell.warn,.cell.bad{box-shadow:inset 4px 0 0 var(--orange),var(--shadow)}
+.cell.bad{box-shadow:inset 4px 0 0 var(--red),var(--shadow)}
+.todos{margin-top:16px;overflow:hidden}
+.todos>h2{font-size:16px;font-weight:700;padding:16px 20px 8px}
+.todo{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 10px;padding:12px 20px;border-top:1px solid var(--line2);font-size:14px;line-height:1.5}
+.todo i{width:8px;height:8px;border-radius:50%;flex:none;margin-top:7px}
+.todo i.red{background:var(--red)}.todo i.orange{background:var(--orange)}.todo i.green{background:var(--teal)}
+.todo p{flex:1;min-width:0;font-weight:600}
+.todo p small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:2px}
+.btn{flex:none;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 16px;color:var(--blue);font-size:14px;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--blue)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#1f5590}
+.entries{margin-top:16px;display:grid;gap:16px}
+.entries.cols3{grid-template-columns:repeat(3,1fr)}
+.entries.cols5{grid-template-columns:repeat(5,1fr)}
+.entry{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;display:flex;flex-direction:column;align-items:flex-start;gap:2px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.entry:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(42,100,163,.12)}
+.entry span{font-size:14px;font-weight:400;color:var(--muted);white-space:nowrap}
+.tag{display:inline-block;padding:1px 8px;border-radius:6px;font-size:12px;font-weight:700;white-space:nowrap}
+.tag.red{background:var(--red-bg);color:var(--red)}
+.tag.orange{background:var(--orange-bg);color:var(--orange)}
+.tag.green{background:var(--green-bg);color:var(--green)}
+.tag.blue{background:var(--blue-bg);color:var(--blue)}
+.tag.gray{background:var(--line2);color:var(--ink2)}
+.tag.sim{background:var(--sim-bg);color:var(--sim)}
+.vhead{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.vhead h2{font-size:20px;font-weight:700}
+.vhead .sub{font-size:14px;color:var(--muted)}
+.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.qtag{display:inline-flex;align-items:center;font-size:12px;font-weight:700;white-space:nowrap;padding:1px 8px;border-radius:6px}
+.qtag.g{background:var(--green-bg);color:var(--green)}
+.qtag.y{background:var(--blue-bg);color:var(--blue)}
+.qtag.o{background:var(--orange-bg);color:var(--orange)}
+.qtag.r{background:var(--red-bg);color:var(--red)}
+.classbar{display:flex;align-items:center;gap:12px;padding:12px 20px;font-size:14px;margin-bottom:16px;box-shadow:inset 4px 0 0 var(--red),var(--shadow)}
+.classbar .sub{color:var(--muted)}
+.classbar .pkg{margin-left:auto;color:var(--red);font-weight:700}
+footer{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
+/* 顶部固定导航 */
+#ovTable{scroll-margin-top:130px}
+.brand{font-size:18px;cursor:pointer}
+/* 左侧树形导航：公司层 → 项目层 → 项目下的页面；风险与待办事项在两层各有一份，按范围筛选 */
+.layout{display:flex;align-items:flex-start}
+.side{width:248px;flex:none;position:sticky;top:var(--hd,57px);height:calc(100vh - var(--hd,57px));overflow:auto;background:rgba(255,255,255,.85);box-shadow:1px 0 0 var(--line);padding:8px 0 24px}
+.main{flex:1;min-width:0}
+.sg{padding:16px 20px 6px;font-size:12px;color:var(--muted);letter-spacing:1px}
+.si{display:flex;align-items:center;gap:8px;padding:8px 16px 8px 20px;font-size:14px;color:var(--ink2);cursor:pointer;position:relative;white-space:nowrap}
+.si:hover{background:#f3f7fb}
+.si.on{background:var(--blue-bg);color:var(--blue);font-weight:700}
+.si.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 2px 2px 0;background:var(--blue)}
+.si .car{width:10px;font-size:10px;color:var(--ref);transition:transform .15s;font-style:normal}
+.si.open .car{transform:rotate(90deg)}
+.si.proj.open{color:var(--ink);font-weight:700}
+.si .qd{width:8px;height:8px;border-radius:50%;flex:none}
+.si .ct{margin-left:auto;font-size:12px;color:var(--muted);font-weight:400}
+.si .ct.r{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-weight:700;line-height:18px;text-align:center}
+.si.kid{padding-left:46px}
+.crumbs{max-width:1400px;margin:0 auto;padding:16px 28px 0;font-size:13px;color:var(--muted)}
+.crumbs a{color:var(--blue);cursor:pointer}
+.crumbs i{font-style:normal;margin:0 8px;color:var(--ref)}
+.tgrp{display:flex;align-items:center;gap:8px;padding:10px 20px 4px;border-top:1px solid var(--line2);font-size:13px;font-weight:700;color:var(--ink2);cursor:pointer}
+.tgrp+.todo{border-top:0}
+.todo .acts{display:flex;gap:8px;flex-basis:100%;padding-left:18px}
+.todo .btn{padding:3px 12px;font-size:12px}
+/* 首页散点图与待处理并排：行高由散点图决定，待处理卡等高、超出部分卡内滚动 */
+.corow{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(380px,1fr);gap:16px;margin-top:16px}
+.corow>.todos{margin-top:0;height:0;min-height:100%;overflow-y:auto}
+.corow>.todos>h2{position:sticky;top:0;background:var(--card);z-index:1}
+.empty{padding:16px 20px;color:var(--muted);font-size:14px}
+.rk{color:var(--blue);cursor:pointer;font-size:14px}
+.rk:hover{text-decoration:underline}
+.rk.off{color:var(--muted);cursor:default;text-decoration:none}
+small.org{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.cft{white-space:nowrap;font-size:14px}
+#taskBody td:nth-child(3),#taskBody td:nth-child(4),#taskBody td:nth-child(5),#taskBody td:nth-child(7){white-space:nowrap}
+.rescan{padding:5px 14px}
+/* 封面与扫描过程 */
+#cover{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;color:#fff;
+background:radial-gradient(ellipse at 50% 32%,#245283 0%,#142a44 58%,#0c1a2b 100%);transition:opacity .5s}
+#cover.hide{opacity:0;pointer-events:none}
+.cv-in{width:520px;text-align:center}
+.cv-mark{width:120px;height:120px;margin:0 auto 28px;position:relative;border-radius:50%;border:1px solid rgba(255,255,255,.22)}
+.cv-mark::before{content:"";position:absolute;inset:22px;border-radius:50%;border:1px solid rgba(255,255,255,.18)}
+.cv-mark::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#7fbaff;box-shadow:0 0 16px #7fbaff}
+.cv-mark span{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(127,186,255,0) 0deg,rgba(127,186,255,0) 270deg,rgba(127,186,255,.5) 360deg);opacity:0;transition:opacity .3s}
+#cover.run .cv-mark span{opacity:1;animation:spin 1.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cv-in h1{font-size:36px;font-weight:700;letter-spacing:2px}
+.cv-sub{margin-top:10px;font-size:14px;color:rgba(255,255,255,.62)}
+.cv-btn{margin-top:36px;padding:12px 56px;border:0;border-radius:999px;background:#fff;color:#142a44;font-weight:700;font-size:18px;font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.cv-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#cover.run .cv-btn{display:none}
+.cv-run{display:none;margin-top:32px;text-align:left}
+#cover.run .cv-run{display:block}
+.cv-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+.cv-bar i{display:block;height:100%;width:0;background:#7fbaff;transition:width .45s ease}
+.cv-run ul{list-style:none;margin:18px 0 0;padding:0}
+.cv-run li{display:flex;align-items:center;gap:12px;padding:7px 0;font-size:15px;color:rgba(255,255,255,.35);transition:color .2s}
+.cv-run li.run{color:#fff}
+.cv-run li.done{color:rgba(255,255,255,.85)}
+.cv-run li i{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex:none;font-style:normal;font-size:11px;line-height:12px;text-align:center}
+.cv-run li.run i{border-color:#7fbaff;border-top-color:transparent;animation:spin .8s linear infinite}
+.cv-run li.done i{border-color:#3fbf82;background:#3fbf82;color:#0c1a2b;font-weight:700}
+.cv-run li b{margin-left:auto;font-weight:400;font-size:14px;color:#a9d1ff;opacity:0;transition:opacity .3s}
+.cv-run li.done b{opacity:1}
+.cv-done{margin-top:16px;font-size:15px;font-weight:700;color:#3fbf82;opacity:0;transition:opacity .3s;text-align:center}
+#cover.fin .cv-done{opacity:1}
+/* 头条 */
+.verdict{padding:18px 24px;box-shadow:inset 4px 0 0 var(--red),var(--shadow)}
+.verdict .main h2{font-size:20px;font-weight:700}
+.verdict .main p{font-size:14px;color:var(--muted);margin-top:4px}
+/* 分型分布 */
+.mix{padding:18px 22px}
+.mix h4{font-size:14px;font-weight:400;color:var(--muted)}
+.mixbar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:12px 0 12px;gap:2px}
+.mixbar i{display:block}
+.mixleg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mixleg div{font-size:14px;color:var(--muted);line-height:1.4}
+.mixleg b{display:block;font-size:20px;color:var(--ink)}
+.mixleg s{text-decoration:none;display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:1px}
+/* 表格 */
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:16px;overflow:hidden}
+caption{text-align:left;font-size:16px;font-weight:700;padding:16px 20px 8px;background:#fff;border-radius:12px 12px 0 0;box-shadow:var(--shadow);clip-path:inset(-10px -10px 0 -10px)}
+th,td{padding:12px 16px;text-align:left;font-size:15px;border-bottom:1px solid var(--line2)}
+th{font-size:12px;font-weight:400;color:var(--muted);background:#fafbfc;letter-spacing:.5px}
+tbody tr:hover{background:#f7f9fc;cursor:pointer}
+tbody tr:last-child td{border-bottom:0}
+td .nm{font-weight:700}
+.diag{font-size:14px;color:var(--ink2);max-width:280px}
+.bar{width:90px;height:6px;border-radius:3px;background:var(--line2);overflow:hidden;display:inline-block;vertical-align:middle}
+.bar i{display:block;height:100%;border-radius:3px}
+.bar.i i{background:var(--teal)}.bar.o i{background:var(--blue)}
+td .pct{font-size:14px;font-weight:700;margin-left:8px}
+td .inv{font-size:12px;color:var(--red);font-weight:700;margin-left:6px}
+td.num{text-align:right;font-weight:700}
+td.num.neg{color:var(--red)}
+td.num.warn{color:var(--orange)}
+td .sub{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+td.center{text-align:center}
+.badge{display:inline-block;min-width:22px;padding:0 7px;border-radius:6px;font-size:12px;font-weight:700;text-align:center}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.gray{background:var(--line2);color:var(--muted)}
+/* 项目视图 */
+.crumb{font-size:14px;color:var(--blue);cursor:pointer;display:inline-block;margin-bottom:12px}
+.verdicts{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.vcard{padding:18px 24px}
+.vcard.bad{box-shadow:inset 4px 0 0 var(--red),var(--shadow)}
+.vcard.warn{box-shadow:inset 4px 0 0 var(--orange),var(--shadow)}
+.vcard h3{font-size:14px;font-weight:400;color:var(--muted)}
+.vcard .big{display:flex;align-items:baseline;gap:12px;margin-top:2px;flex-wrap:wrap}
+.vcard .big b{font-size:36px;font-weight:700;line-height:1.3}
+.vcard.bad .big b{color:var(--red)}
+.vcard.warn .big b{color:var(--orange)}
+.vcard .big span{font-size:14px;color:var(--muted)}
+.vcard .big span strong{color:var(--ink);font-size:16px}
+.vcard p{font-size:14px;color:var(--ink2);margin-top:6px}
+.trio{display:grid;grid-template-columns:1.25fr .8fr 1.25fr;gap:16px;margin-top:16px}
+.pane{padding:18px 22px}
+.pane>h3{font-size:16px;font-weight:700;display:flex;align-items:center;gap:12px}
+.lg{margin-left:auto;display:flex;gap:14px;font-size:12px;font-weight:400;color:var(--muted)}
+.lg span{display:inline-flex;align-items:center;gap:5px}
+.lg i{display:inline-block;width:16px;height:0;border-top:2px solid}
+.lg i.d{border-top-style:dashed}
+.chart{display:block;width:100%;height:auto;margin-top:8px;overflow:visible}
+.chart text{font-family:inherit}
+.chain{margin-top:10px}
+.link{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:15px}
+.link .nm{width:44px;color:var(--muted);font-size:14px;flex:none}
+.link .bar2{flex:1;height:20px;border-radius:4px;background:var(--line2);position:relative;overflow:hidden}
+.link .bar2 i{position:absolute;inset:0;border-radius:4px;background:#5b8fc4;display:flex;align-items:center;padding-left:8px;color:#fff;font-size:12px;font-weight:700;min-width:34px;font-style:normal}
+.link.out .bar2 i{background:#4aa07c}
+.link .gap{flex:none;font-size:14px;color:var(--orange);white-space:nowrap}
+.link .gap.red{color:var(--red);font-weight:700}
+.link .amt{flex:none;width:64px;text-align:right;font-weight:700}
+.poolnum{display:grid;gap:12px;margin-top:10px}
+.poolnum .row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--muted)}
+.poolnum .row b{font-size:28px;color:var(--red)}
+.dual-band{margin-top:16px;padding:16px 22px;display:grid;grid-template-columns:1fr 1fr auto;gap:24px;align-items:center}
+.dp small{display:block;font-size:14px;color:var(--muted);margin-bottom:6px}
+.dp .track{height:10px;border-radius:5px;background:var(--line2);overflow:hidden}
+.dp .track i{display:block;height:100%;border-radius:5px}
+.dp.in i{background:var(--teal)}
+.dp.out i{background:var(--blue)}
+.dp .pct{font-size:16px;font-weight:700;margin-top:4px}
+.vsgap{text-align:center}
+.vsgap b{display:block;font-size:28px;color:var(--red);line-height:1.2}
+.vsgap span{font-size:14px;color:var(--muted)}
+/* 建议模拟 */
+.sims{padding:18px 22px;margin-top:16px}
+.sims>b{font-size:16px}
+.simopts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.simopt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:14px;color:var(--ink2);transition:border-color .15s,background .15s}
+.simopt:hover{border-color:var(--sim)}
+.simopt input{margin-top:4px;accent-color:var(--sim)}
+.simopt b{display:block;font-size:15px;color:var(--ink)}
+.simopt.on{border-color:var(--sim);background:var(--sim-bg)}
+.simfoot{display:flex;align-items:center;gap:16px;margin-top:12px}
+#simNote{flex:1;font-size:14px;color:var(--ink2)}
+#simNote.on{color:var(--sim);font-weight:700}
+/* 台账 */
+#ledgerTbl{box-shadow:none;margin-top:8px}
+#ledgerTbl th.gm,#ledgerTbl td.gm{background:#f6f9fc}
+#ledgerTbl th.gc,#ledgerTbl td.gc{background:#f4faf7}
+#ledgerTbl tr.divr td{background:var(--line2);color:var(--muted);font-size:12px;text-align:center;letter-spacing:4px;padding:4px}
+#ledgerTbl .simv{color:var(--sim)!important;font-weight:700}
+#ledgerTbl tr.det{display:none}
+#ledgerTbl tr.det td{background:#fafbfd;color:var(--muted);font-size:14px;line-height:1.6}
+#ledgerTbl tbody tr[onclick]{cursor:pointer}
+#ledgerTbl tbody tr[onclick]:hover td{filter:brightness(.97)}
+#ledgerTbl tr.fut td{color:var(--ink2)}
+.crt{color:var(--ref);font-size:12px;margin-left:4px}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:6px 2px}
+.cpane h5{font-size:14px;color:var(--ink);margin:2px 0 6px;font-weight:700}
+.cline{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--ink);padding:3px 0}
+.cline b{font-weight:700;white-space:nowrap}
+.cline.total{border-top:1px dashed var(--line);margin-top:4px;padding-top:6px;color:var(--blue);font-weight:700}
+.csub{font-size:12px;color:var(--muted);padding:1px 0 6px 12px;line-height:1.7}
+tr.new td{background:var(--sim-bg)}
+
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;flex:none}
+.lang button{border:0;background:transparent;padding:5px 10px;color:var(--muted);font:600 12px/1.2 inherit;cursor:pointer}
+.lang button.on{background:var(--blue);color:#fff}
+#cover .lang{position:absolute;top:22px;right:22px;background:transparent;border-color:rgba(255,255,255,.35)}
+#cover .lang button{color:rgba(255,255,255,.85)}
+#cover .lang button.on{background:#fff;color:#142a44}
+html[lang="en"] .side{width:300px}
+html[lang="en"] .link .nm{width:84px}
+html[lang="en"] .diag{max-width:460px}
+html[lang="en"] .cv-in{width:680px}
+html[lang="en"] .cv-in h1{letter-spacing:0;font-size:32px}
+html[lang="en"] th,html[lang="en"] .sg{letter-spacing:0}
+html[lang="en"] .classbar,html[lang="en"] .vhead,html[lang="en"] .simfoot{flex-wrap:wrap}
+html[lang="en"] .brand{font-size:16px}
+</style>
+</head>
+<body>
+
+<div id="cover">
+<div class="lang" data-no-i18n>
+  <button type="button" data-lang-btn="zh" onclick="setLang('zh')">中文</button>
+  <button type="button" data-lang-btn="en" onclick="setLang('en')">EN</button>
+</div>
+  <div class="cv-in">
+    <div class="cv-mark"><span></span></div>
+    <h1>项目经营资金助手</h1>
+    <p class="cv-sub">在施项目 6 个 · 支出合同 150 份 · 上次扫描 2026-10-20 08:00</p>
+    <button class="cv-btn" onclick="startScan()">开始扫描</button>
+    <div class="cv-run">
+      <div class="cv-bar"><i id="cvBar"></i></div>
+      <ul id="cvSteps"></ul>
+      <div class="cv-done">扫描完成</div>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="in">
+    <b class="brand" onclick="showCompany()">项目经营资金助手</b>
+    <div class="lang" data-no-i18n>
+  <button type="button" data-lang-btn="zh" onclick="setLang('zh')">中文</button>
+  <button type="button" data-lang-btn="en" onclick="setLang('en')">EN</button>
+</div>
+    <select class="sel" style="margin-left:auto"><option>2026-10</option><option>2026-09</option></select>
+    <time id="scanTime" data-time="2026-10-20 08:00">扫描完成 2026-10-20 08:00</time>
+    <button class="btn rescan" onclick="startScan()">重新扫描</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="side" id="side"></aside>
+<main class="main">
+<div class="crumbs" id="crumbs"></div>
+
+<!-- ============ 公司视图 ============ -->
+<div class="wrap view on" id="companyView">
+
+  <!-- 项目分型 + 公司综合指标 -->
+  <div class="pool" style="grid-template-columns:2fr 1fr 1fr;margin-top:0">
+    <div class="mix pane">
+      <h4>项目分型 · 6 个项目</h4>
+      <div class="mixbar"><i style="flex:3;background:var(--green)"></i><i style="flex:2;background:var(--orange)"></i><i style="flex:1;background:var(--red)"></i></div>
+      <div class="mixleg">
+        <div><s style="background:var(--green)"></s>健康型<b>3</b>城东 · 华夏 · 市政</div>
+        <div><s style="background:var(--blue)"></s>垫资型<b>0</b>—</div>
+        <div><s style="background:var(--orange)"></s>低效型<b style="color:var(--orange)">2</b>科技 · 滨江</div>
+        <div><s style="background:var(--red)"></s>高危型<b style="color:var(--red)">1</b>文旅</div>
+      </div>
+    </div>
+    <div class="cell warn"><h4>综合动态毛利</h4><strong>9.6%</strong><div class="d">目标 10%</div></div>
+    <div class="cell"><h4>综合现金流活跃度</h4><strong>1.09</strong><div class="d">分界 1.0</div></div>
+  </div>
+
+  <!-- 散点图 + 行动区 并排 -->
+  <div class="corow">
+  <div class="pane">
+    <h3>项目分型分布</h3>
+    <svg id="scatter" class="chart" viewBox="0 0 720 600"></svg>
+  </div>
+
+  <!-- 行动区 -->
+  <div class="todos" id="coTodos"></div>
+  </div>
+
+  <table id="ovTable">
+    <caption>项目经营总览 · 6 个项目</caption>
+    <thead>
+      <tr><th>项目</th><th>诊断</th><th>回款进度</th><th>付款进度</th><th style="text-align:right">现金流</th><th style="text-align:right">动态毛利</th><th style="text-align:center">风险 / 在办待办</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="nm">文旅小镇二期</span><br><span class="qtag r">高危型</span> <span class="tag red">滑移</span></td>
+        <td class="diag">付比收快 18 个点，连续 4 个月净流出；最大问题是业主回款停滞</td>
+        <td><span class="bar i"><i style="width:42%"></i></span><span class="pct">42%</span></td>
+        <td><span class="bar o"><i style="width:60%"></i></span><span class="pct">60%</span><span class="inv">收付差18</span></td>
+        <td class="num neg">-980<span class="sub">活跃度 0.80</span></td>
+        <td class="num warn">6.8%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge red">4</span> <span class="badge gray">2</span></td>
+      </tr>
+      <tr>
+        <td><span class="nm">科技产业园</span><br><span class="qtag o">低效型</span></td>
+        <td class="diag">动态毛利 9.5% 低于目标；在途付款申请付后将超结算 180 万</td>
+        <td><span class="bar i"><i style="width:61%"></i></span><span class="pct">61%</span></td>
+        <td><span class="bar o"><i style="width:58%"></i></span><span class="pct">58%</span></td>
+        <td class="num">+320<span class="sub">活跃度 1.10</span></td>
+        <td class="num">9.5%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge red">1</span> <span class="badge gray">1</span></td>
+      </tr>
+      <tr>
+        <td><span class="nm">滨江商业综合体</span><br><span class="qtag o">低效型</span></td>
+        <td class="diag">动态毛利 8.9% 低于目标；计量催办逾期已升级</td>
+        <td><span class="bar i"><i style="width:55%"></i></span><span class="pct">55%</span></td>
+        <td><span class="bar o"><i style="width:49%"></i></span><span class="pct">49%</span></td>
+        <td class="num">+180<span class="sub">活跃度 1.05</span></td>
+        <td class="num">8.9%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge red">1</span> <span class="badge gray">1</span></td>
+      </tr>
+      <tr>
+        <td><span class="nm">城东安置房</span><br><span class="qtag g">健康型</span></td>
+        <td class="diag">回款 420 万到账，回款进度重回付款进度之上</td>
+        <td><span class="bar i"><i style="width:68%"></i></span><span class="pct">68%</span></td>
+        <td><span class="bar o"><i style="width:62%"></i></span><span class="pct">62%</span></td>
+        <td class="num">+450<span class="sub">活跃度 1.12</span></td>
+        <td class="num">10.2%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge gray">0</span> <span class="badge gray">0</span></td>
+      </tr>
+      <tr>
+        <td><span class="nm">华夏艺术中心</span><br><span class="qtag g">健康型</span></td>
+        <td class="diag">节奏正常；请款环节 400 万可催</td>
+        <td><span class="bar i"><i style="width:74%"></i></span><span class="pct">74%</span></td>
+        <td><span class="bar o"><i style="width:70%"></i></span><span class="pct">70%</span></td>
+        <td class="num">+1,650<span class="sub">活跃度 1.21</span></td>
+        <td class="num">11.5%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge gray">0</span> <span class="badge gray">1</span></td>
+      </tr>
+      <tr>
+        <td><span class="nm">市政道路改造</span><br><span class="qtag g">健康型</span></td>
+        <td class="diag">正常</td>
+        <td><span class="bar i"><i style="width:70%"></i></span><span class="pct">70%</span></td>
+        <td><span class="bar o"><i style="width:64%"></i></span><span class="pct">64%</span></td>
+        <td class="num">+720<span class="sub">活跃度 1.15</span></td>
+        <td class="num">10.8%<span class="sub">目标 10%</span></td>
+        <td class="center"><span class="badge gray">0</span> <span class="badge gray">0</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer>演示 V0.5 · 模拟数据 · 金额单位：万元（含税）</footer>
+</div>
+
+<!-- ============ 项目视图 ============ -->
+<div class="wrap view" id="projectView">
+
+
+  <div class="classbar">
+    当前归类：<span class="qtag r">高危型</span>
+    <span class="sub">上期：垫资型 · 本期确认钢材超支后滑入</span>
+    <span class="pkg">处置包：停新增支出 · 高层对账 · 专项盘活</span>
+  </div>
+
+  <div class="verdicts">
+    <div class="vcard warn">
+      <h3>挣不挣钱 · 动态毛利</h3>
+      <div class="big"><b>6.8%</b><span>目标毛利 10% · 缺口 3.2 个点</span></div>
+      <p>主因：钢材采购价超目标成本约 210 万；业主变更签证 180 万已报未批。</p>
+    </div>
+    <div class="vcard bad">
+      <h3>有没有钱 · 累计净现金流</h3>
+      <div class="big"><b>-980 万</b><span>活跃度 <strong>0.80</strong> · 连续 4 个月净流出</span></div>
+      <p>主因：业主回款停滞（1,150 万请款未付）；付得比收快 18 个点。</p>
+    </div>
+  </div>
+  <!-- 三线图：计划 · 实际 · 预测 -->
+  <div class="trio" style="grid-template-columns:1fr 1fr;margin-top:16px">
+    <div class="pane">
+      <h3>动态毛利<span class="lg"><span><i class="d" style="border-color:var(--ref)"></i>目标</span><span><i style="border-color:var(--blue)"></i>实际</span><span><i class="d fcK" style="border-color:var(--blue)"></i>预测</span></span></h3>
+      <svg id="mgChart" class="chart" viewBox="0 0 640 270"></svg>
+    </div>
+    <div class="pane">
+      <h3>累计净现金流<span class="lg"><span><i class="d" style="border-color:var(--ref)"></i>计划</span><span><i style="border-color:var(--teal)"></i>实际</span><span><i class="d fcK" style="border-color:var(--teal)"></i>预测</span></span></h3>
+      <svg id="cfChart" class="chart" viewBox="0 0 640 270"></svg>
+    </div>
+  </div>
+
+  <!-- 行动建议模拟 -->
+  <div class="sims">
+    <b>建议模拟</b>
+    <div class="simopts">
+      <label class="simopt"><input type="checkbox" onchange="simTgl('a',this)"><span><b>A. 变更签证 180 万 11 月获批</b>收入 +180 · 1 月毛利 6.3% → 8.1%</span></label>
+      <label class="simopt"><input type="checkbox" onchange="simTgl('b',this)"><span><b>B. 逾期请款 350 万 11 月催回</b>11 月回款 +350 · 累计 -950 → -600</span></label>
+      <label class="simopt"><input type="checkbox" onchange="simTgl('c',this)"><span><b>C. 12 月材料结算 250 万延至 1 月</b>12 月付款 -250 · 1 月 +250</span></label>
+    </div>
+    <div class="simfoot">
+      <div id="simNote">基准：1 月累计净现金流 -1,795 · 期末毛利 6.3%</div>
+      <button class="btn primary" onclick="adoptSim()">采纳并转待办</button>
+    </div>
+  </div>
+
+  <!-- 合并月度台账：图的计算底稿 -->
+  <div class="pane" style="margin-top:16px">
+    <h3>月度台账</h3>
+    <table id="ledgerTbl" style="margin-top:6px;font-size:14px">
+      <thead>
+        <tr><th rowspan="2">月份</th><th colspan="2" class="gm" style="text-align:center">毛利（动态）</th><th colspan="3" class="gc" style="text-align:center">净现金流（万）</th><th rowspan="2">偏差归因 / 计算要素</th></tr>
+        <tr><th class="gm" style="text-align:right">预测</th><th class="gm" style="text-align:right">实际</th><th class="gc" style="text-align:right">预测</th><th class="gc" style="text-align:right">实际</th><th class="gc" style="text-align:right">累计</th></tr>
+      </thead>
+      <tbody>
+        <tr onclick="tglDet(this)"><td>1月<span class="crt">▾</span></td><td class="gm num">—</td><td class="gm num">913（9.8%）</td><td class="gc num">—</td><td class="gc num">+200</td><td class="gc num">+200</td><td class="diag">目标成本基线核定</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 HT-2025-018（1 份）</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：目标成本基线 ReAimCost V1.0 核定</span><b>8,407</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,407</span><b>913（9.8%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×2）</span><b>500</b></div>
+            <div class="csub">01-15 预付款 300（SK-1001）· 01-28 进度款 200（SK-1005）</div>
+            <div class="cline"><span>付款（付款登记单 ×2）</span><b>300</b></div>
+            <div class="csub">01-20 劳务 120（FK-2003）· 01-26 钢筋 180（FK-2005）</div>
+            <div class="cline total"><span>当月净 = 500 − 300 · 累计 +200</span><b>+200</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>2月<span class="crt">▾</span></td><td class="gm num">9.7%</td><td class="gm num">923（9.9%）</td><td class="gc num">+110</td><td class="gc num">+130</td><td class="gc num">+330</td><td class="diag">签价让利 +0.2 点；现金流符合</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320（无新批变更）</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,407 − 16（劳务分包合同 LD-02 签订价低于目标）+ 6（零星签证）</span><b>8,397</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,397</span><b>923（9.9%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×1）</span><b>430</b></div>
+            <div class="csub">02-26 进度款 430（SK-1009）</div>
+            <div class="cline"><span>付款（付款登记单 ×2）</span><b>300</b></div>
+            <div class="csub">02-18 劳务 120（FK-2011）· 02-24 模板 180（FK-2014）</div>
+            <div class="cline total"><span>当月净 = 430 − 300 · 累计 +330</span><b>+130</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>3月<span class="crt">▾</span></td><td class="gm num">9.9%</td><td class="gm num">941（10.1%）</td><td class="gc num">+150</td><td class="gc num">+120</td><td class="gc num">+450</td><td class="diag">采购节支；付款略早</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,397 − 18（苗木采购合同 CG-07 签订价低于目标）</span><b>8,379</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,379</span><b>941（10.1%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×2）</span><b>620</b></div>
+            <div class="csub">03-12 进度款 400（SK-1012）· 03-28 进度款 220（SK-1015）</div>
+            <div class="cline"><span>付款（付款登记单 ×3）</span><b>500</b></div>
+            <div class="csub">03-10 劳务 150（FK-2018）· 03-19 苗木 200（FK-2021）· 03-27 钢筋 150（FK-2024）</div>
+            <div class="cline total"><span>当月净 = 620 − 500 · 累计 +450</span><b>+120</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>4月<span class="crt">▾</span></td><td class="gm num">10.1%</td><td class="gm num">932（10.0%）</td><td class="gc num">+80</td><td class="gc num">+50</td><td class="gc num">+500</td><td class="diag">符合；计量确认延迟</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,379 + 9（砂石采购价差首批确认）</span><b>8,388</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,388</span><b>932（10.0%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×1）</span><b>550</b></div>
+            <div class="csub">04-25 进度款 550（SK-1017）</div>
+            <div class="cline"><span>付款（付款登记单 ×4）</span><b>500</b></div>
+            <div class="csub">04-09 劳务 150 · 04-15 砂石 200 · 04-22 塔吊 45 · 04-28 其他 105</div>
+            <div class="cline total"><span>当月净 = 550 − 500 · 累计 +500</span><b>+50</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>5月<span class="crt">▾</span></td><td class="gm num">10.0%</td><td class="gm num">895（9.6%）</td><td class="gc num">-60</td><td class="gc num neg">-120</td><td class="gc num">+380</td><td class="diag">建材涨价 0.4 点；材料集中采购</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,388 + 37（砂石续涨确认）</span><b>8,425</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,425</span><b>895（9.6%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×2）</span><b>580</b></div>
+            <div class="csub">05-14 进度款 400 · 05-29 进度款 180</div>
+            <div class="cline"><span>付款（付款登记单 ×5 · 材料集中采购）</span><b>700</b></div>
+            <div class="csub">05-08 劳务 150 · 05-13 钢材 350 · 05-20 砂石 120 · 05-23 塔吊 45 · 05-27 其他 35</div>
+            <div class="cline total"><span>当月净 = 580 − 700 · 累计 +380</span><b>-120</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>6月<span class="crt">▾</span></td><td class="gm num">9.6%</td><td class="gm num">876（9.4%）</td><td class="gc num">-100</td><td class="gc num neg">-260</td><td class="gc num">+120</td><td class="diag">符合；业主进度款拖 15 天</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,425 + 19（钢构补充协议 BC-03 调价）</span><b>8,444</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,444</span><b>876（9.4%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×1）</span><b>460</b></div>
+            <div class="csub">06-27 进度款 460（约定 06-12，拖 15 天）</div>
+            <div class="cline"><span>付款（付款登记单 ×4）</span><b>720</b></div>
+            <div class="csub">06-10 劳务 150 · 06-16 钢材 400 · 06-22 塔吊 45 · 06-29 其他 125</div>
+            <div class="cline total"><span>当月净 = 460 − 720 · 累计 +120</span><b>-260</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>7月<span class="crt">▾</span></td><td class="gm num">9.4%</td><td class="gm num">857（9.2%）</td><td class="gc num">-120</td><td class="gc num neg">-200</td><td class="gc num neg">-80</td><td class="diag">符合；回款持续低于计划</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,444 + 19（塔吊续租合同 ZL-11）</span><b>8,463</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,463</span><b>857（9.2%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×1）</span><b>480</b></div>
+            <div class="csub">07-26 进度款 480</div>
+            <div class="cline"><span>付款（付款登记单 ×4）</span><b>680</b></div>
+            <div class="csub">07-08 劳务 150 · 07-15 混凝土 300 · 07-21 钢构 180 · 07-25 塔吊 50</div>
+            <div class="cline total"><span>当月净 = 480 − 680 · 累计 -80</span><b>-200</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>8月<span class="crt">▾</span></td><td class="gm num">9.4%</td><td class="gm num">820（8.8%）</td><td class="gc num">-150</td><td class="gc num neg">-100</td><td class="gc num neg">-180</td><td class="diag">钢材调涨 0.6 点未预估；符合修正预期</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,463 + 37（钢材价差首批确认，采购价超目标）</span><b>8,500</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,500</span><b>820（8.8%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×2）</span><b>520</b></div>
+            <div class="csub">08-13 进度款 300 · 08-28 进度款 220</div>
+            <div class="cline"><span>付款（付款登记单 ×4）</span><b>620</b></div>
+            <div class="csub">08-08 劳务 150 · 08-14 钢构 250 · 08-21 塔吊 45 · 08-29 其他 175</div>
+            <div class="cline total"><span>当月净 = 520 − 620 · 累计 -180</span><b>-100</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>9月<span class="crt">▾</span></td><td class="gm num">8.6%</td><td class="gm num">736（7.9%）</td><td class="gc num">+100</td><td class="gc num neg">-150</td><td class="gc num neg">-330</td><td class="diag">价差扩大＋签证未批；业主款 800 未兑现</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：9,320 + 已批变更 0（签证单 QZ-1801 已报未批·不计）</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,500 + 84（钢材价差续确认）</span><b>8,584</b></div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,584</span><b>736（7.9%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×1）</span><b>380</b></div>
+            <div class="csub">09-26 进度款 380（业主款 800 未兑现）</div>
+            <div class="cline"><span>付款（付款登记单 ×3）</span><b>530</b></div>
+            <div class="csub">09-09 劳务 150 · 09-17 钢材 200 · 09-25 混凝土 180</div>
+            <div class="cline total"><span>当月净 = 380 − 530 · 累计 -330</span><b>-150</b></div>
+          </div>
+        </div></td></tr>
+        <tr onclick="tglDet(this)"><td>10月<span class="crt">▾</span></td><td class="gm num">7.5%</td><td class="gm num">630（6.8%）</td><td class="gc num">-200</td><td class="gc num neg">-650</td><td class="gc num neg">-980</td><td class="diag">钢材调涨未传导；回款少 300＋付款多 150</td></tr>
+        <tr class="det"><td colspan="7"><div class="calc">
+          <div class="cpane"><h5>权责发生 · 毛利计算过程</h5>
+            <div class="cline"><span>收入侧：收入合同 9,320 + 已批变更 0</span><b>9,320</b></div>
+            <div class="cline"><span>成本侧：8,584 + 106（砂石价差 +40 · 塔吊续租 +20 · 钢材价差 +46）</span><b>8,690</b></div>
+            <div class="csub">累计变动 +283（基线 8,407）：劳务签价 -16 · 苗木签价 -18 · 砂石价差 +86 · 钢构补充协议 +19 · 塔吊 +39 · 钢材价差 +167 · 其他零星 +6（全周期钢材价差预估 210，已确认 167）</div>
+            <div class="cline total"><span>毛利 = 9,320 − 8,690</span><b>630（6.8%）</b></div>
+          </div>
+          <div class="cpane"><h5>收付实现 · 现金流计算过程</h5>
+            <div class="cline"><span>回款（收款登记单 ×2）</span><b>400</b></div>
+            <div class="csub">10-08 进度款 250（SK-1018）· 10-25 结算款 150（SK-1022）</div>
+            <div class="cline"><span>付款（付款登记单 ×6）</span><b>1,050</b></div>
+            <div class="csub">10-05 劳务工资 260 · 10-08 混凝土 180 · 10-12 钢结构争议先付 220 · 10-15 塔吊 45 · 10-20 景观预付款 150 · 10-28 模板 195</div>
+            <div class="cline total"><span>当月净 = 400 − 1,050 · 累计 -980</span><b>-650</b></div>
+          </div>
+        </div></td></tr>
+        <tr class="divr" id="fcDiv"><td colspan="7">预测</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pool" style="grid-template-columns:repeat(3,1fr)">
+    <div class="cell warn"><h4>本月回款</h4><strong>400<em>万</em></strong><div class="d">计划 1,200 · 达成 33%</div></div>
+    <div class="cell warn"><h4>本月付款</h4><strong>1,050<em>万</em></strong><div class="d">计划 900 · 超 17%</div></div>
+    <div class="cell bad"><h4>本月净现金流</h4><strong>-650<em>万</em></strong><div class="d">累计净现金流 -980</div></div>
+  </div>
+
+  <div class="trio">
+    <div class="pane">
+      <h3>收</h3>
+      <div class="chain">
+        <div class="link"><span class="nm">产值</span><div class="bar2"><i style="width:100%">6,900</i></div><span class="amt">6,900</span></div>
+        <div class="link"><span class="nm">计量</span><div class="bar2"><i style="width:88.4%">6,100</i></div><span class="gap">卡 800</span><span class="amt">6,100</span></div>
+        <div class="link"><span class="nm">结算</span><div class="bar2"><i style="width:81.2%">5,600</i></div><span class="gap">卡 500</span><span class="amt">5,600</span></div>
+        <div class="link"><span class="nm">请款</span><div class="bar2"><i style="width:73.3%">5,060</i></div><span class="gap">卡 540</span><span class="amt">5,060</span></div>
+        <div class="link"><span class="nm">回款</span><div class="bar2"><i style="width:56.7%">3,910</i></div><span class="gap red">卡 1,150</span><span class="amt">3,910</span></div>
+      </div>
+    </div>
+    <div class="pane">
+      <h3>净现金流</h3>
+      <div class="poolnum">
+        <div class="row"><span>累计净现金流</span><b>-980</b></div>
+        <div class="row"><span>连续净流出</span><b>4 个月</b></div>
+        <div class="row"><span class="small">签约测算垫资峰值 -500 · 已超近 1 倍</span></div>
+      </div>
+    </div>
+    <div class="pane">
+      <h3>支</h3>
+      <div class="chain">
+        <div class="link out"><span class="nm">合同</span><div class="bar2"><i style="width:100%">8,150</i></div><span class="amt">8,150</span></div>
+        <div class="link out"><span class="nm">计量</span><div class="bar2"><i style="width:56.4%">4,600</i></div><span class="amt">4,600</span></div>
+        <div class="link out"><span class="nm">结算</span><div class="bar2"><i style="width:52.8%">4,300</i></div><span class="amt">4,300</span></div>
+        <div class="link out"><span class="nm">付款</span><div class="bar2"><i style="width:60%;background:#c0453d">4,890</i></div><span class="gap red">反超 590</span><span class="amt">4,890</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dual-band">
+    <div class="dp in"><small>回款进度（3,910 ÷ 收入合同 9,320）</small><div class="track"><i style="width:42%"></i></div><div class="pct">42%</div></div>
+    <div class="dp out"><small>付款进度（4,890 ÷ 支出合同 8,150）</small><div class="track"><i style="width:60%"></i></div><div class="pct">60%</div></div>
+    <div class="vsgap"><b>18 个点</b><span>付款超回款</span></div>
+  </div>
+
+  <div class="todos" id="pjTodos"></div>
+
+  <footer>演示 V0.5 · 模拟数据 · 金额单位：万元（含税）</footer>
+</div>
+
+<!-- ============ 收入管理 ============ -->
+<div class="wrap view" id="incomeView">
+  <div class="vhead"><h2>收入管理</h2><span class="sub">文旅小镇二期 · 收入合同（含变更）9,320 · 回款进度 42%</span></div>
+  <table>
+    <thead><tr><th>环节</th><th style="text-align:right">累计金额</th><th style="text-align:right">较上级滞留</th><th>滞留内容</th><th>经办/对方</th><th>滞留天数</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>产值确认</td><td class="num">6,900</td><td class="num">—</td><td class="diag">本月产值已确认</td><td class="diag">—</td><td>—</td><td></td></tr>
+      <tr><td>计量</td><td class="num">6,100</td><td class="num warn">800</td><td class="diag">9 月计量 800 未确认</td><td class="diag">张三（施工员）</td><td>12 天</td><td><button class="btn">催办</button></td></tr>
+      <tr><td>结算</td><td class="num">5,600</td><td class="num warn">500</td><td class="diag">二季度结算业主审核中</td><td class="diag">业主造价部</td><td>20 天</td><td><button class="btn">催办</button></td></tr>
+      <tr><td>请款</td><td class="num">5,060</td><td class="num">540</td><td class="diag">待结算完成后开具</td><td class="diag">—</td><td>—</td><td></td></tr>
+      <tr><td>回款</td><td class="num">3,910</td><td class="num neg">1,150</td><td class="diag">请款已开未付，最长挂账 62 天</td><td class="diag">业主财务部</td><td>62 天</td><td><button class="btn primary">发催款函</button></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ 支出管理 ============ -->
+<div class="wrap view" id="expenseView">
+  <div class="vhead"><h2>支出管理</h2><span class="sub">文旅小镇二期 · 38 份支出合同 · 异常置顶</span></div>
+  <div class="mini">
+    <div class="cell"><h4>合同（含变更）</h4><strong>8,150</strong></div>
+    <div class="cell"><h4>累计计量</h4><strong>4,600</strong></div>
+    <div class="cell"><h4>累计结算</h4><strong>4,300</strong></div>
+    <div class="cell bad"><h4>累计付款</h4><strong>4,890</strong><div class="d">反超结算 590</div></div>
+  </div>
+  <table>
+    <thead><tr><th>合同</th><th>类型</th><th style="text-align:right">合同额</th><th style="text-align:right">计量</th><th style="text-align:right">结算</th><th style="text-align:right">付款</th><th>状态</th><th>管控建议</th></tr></thead>
+    <tbody>
+      <tr><td><span class="nm">钢结构专业分包</span></td><td>专业分包</td><td class="num">1,850</td><td class="num">980</td><td class="num">850</td><td class="num neg">1,170</td><td><span class="tag red">反超 320</span></td><td class="diag">先付已确认 220，限 5 天补办结算</td></tr>
+      <tr><td><span class="nm">混凝土采购</span></td><td>材料采购</td><td class="num">1,200</td><td class="num">720</td><td class="num">700</td><td class="num neg">970</td><td><span class="tag red">反超 270</span></td><td class="diag">账期可谈：建议缓付 100 万至 11 月</td></tr>
+      <tr><td><span class="nm">景观绿化分包</span></td><td>专业分包</td><td class="num">480</td><td class="num">0</td><td class="num">0</td><td class="num">150</td><td><span class="tag orange">预付款</span></td><td class="diag">未开工预付款：建议缓至回款后</td></tr>
+      <tr><td><span class="nm">劳务分包（钢筋班）</span></td><td>劳务</td><td class="num">1,600</td><td class="num">1,050</td><td class="num">1,020</td><td class="num">1,020</td><td><span class="tag green">正常</span></td><td class="diag">工资刚性：按期支付</td></tr>
+      <tr><td><span class="nm">塔吊租赁</span></td><td>设备租赁</td><td class="num">260</td><td class="num">180</td><td class="num">180</td><td class="num">180</td><td><span class="tag green">正常</span></td><td class="diag">租金刚性：不付即停工</td></tr>
+      <tr><td><span class="nm">其余 33 份合计</span></td><td>—</td><td class="num">2,760</td><td class="num">1,670</td><td class="num">1,550</td><td class="num">1,400</td><td><span class="tag gray">正常</span></td><td class="diag">—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ 现金流 ============ -->
+<div class="wrap view" id="cashflowView">
+  <div class="vhead"><h2>付款调度</h2><span class="sub">文旅小镇二期 · 以收定支</span></div>
+  <div class="verdict" style="border-left-color:var(--orange)">
+    <div class="main">
+      <h2>本期申请 955，实付 605、缓付 350 —— 刚性保进度、可谈争时间、无据催手续</h2>
+      <p>依据：11 月业主款 800（QS-2091）到账前资金最紧，累计净现金流 -980；缓付 350 于该笔回款到账后恢复。</p>
+    </div>
+  </div>
+  <table>
+    <caption>本期付款调度 · 10-19 已下达 · 通盘扫描 38 份合同</caption>
+    <thead><tr><th>付款申请</th><th style="text-align:right">金额</th><th>档位</th><th>判定依据</th><th>调度动作</th><th>待办</th></tr></thead>
+    <tbody>
+      <tr><td>农民工工资</td><td class="num">260</td><td><span class="tag red">刚性</span></td><td class="diag">劳务付款专户单据</td><td class="diag">照常支付</td><td class="cft">—</td></tr>
+      <tr><td>塔吊租金</td><td class="num">45</td><td><span class="tag red">刚性</span></td><td class="diag">设备租赁合同</td><td class="diag">照常支付</td><td class="cft">—</td></tr>
+      <tr><td>混凝土材料款</td><td class="num">180</td><td><span class="tag orange">可协商</span></td><td class="diag">材料采购 + 账期标签</td><td class="diag">先付 80，100 万谈至 11 月</td><td class="cft" data-t="T6"></td></tr>
+      <tr><td>钢结构进度款</td><td class="num">320</td><td><span class="tag orange">依据不足</span></td><td class="diag">结算未办理</td><td class="diag">先付已确认 220，限 5 天补办结算</td><td class="cft" data-t="T3"></td></tr>
+      <tr><td>景观预付款</td><td class="num">150</td><td><span class="tag blue">非紧急</span></td><td class="diag">工程未启动</td><td class="diag">缓至 11 月回款后</td><td class="cft" data-t="T4"></td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+    <button class="btn" onclick="nav('tasksView','文旅小镇二期',['T3','T4','T6'])">查看调度待办</button>
+    <span style="font-size:13px;color:var(--muted)">上期反馈：9 月缓付 2 笔共 260 万，其中 140 万已于 10 月 8 日业主回款后恢复放行</span>
+  </div>
+</div>
+
+<!-- ============ 风险清单 ============ -->
+<div class="wrap view" id="risksView">
+  <div class="vhead"><h2>风险清单</h2><span class="sub" id="riskSum"></span></div>
+  <table>
+    <thead><tr><th>级别</th><th>项目</th><th>条线</th><th>内容</th><th style="text-align:right">金额</th><th>状态</th><th></th></tr></thead>
+    <tbody id="riskBody"></tbody>
+  </table>
+</div>
+
+<!-- ============ 待办事项 ============ -->
+<div class="wrap view" id="tasksView">
+  <div class="vhead"><h2>待办事项</h2><span class="sub" id="taskSum"></span></div>
+  <table>
+    <thead><tr><th>事项</th><th>对应风险</th><th>责任人</th><th>期限</th><th>轮次</th><th>最近反馈</th><th>状态</th></tr></thead>
+    <tbody id="taskBody"></tbody>
+  </table>
+</div>
+
+</main>
+
+</div>
+
+<script>
+
+var LANG='zh';
+try{var saved=localStorage.getItem('fa-lang');if(saved==='en'||saved==='zh')LANG=saved;}catch(e){}
+var EN={"项目经营资金助手 · 工作台":"Project Cash Assistant · Workbench","项目经营资金助手":"Project Cash Assistant","在施项目 6 个 · 支出合同 150 份 · 上次扫描 2026-10-20 08:00":"6 live projects · 150 cost contracts · last scan 2026-10-20 08:00","开始扫描":"Start scan","扫描完成":"Scan complete","扫描完成 2026-10-20 08:00":"Scan complete 2026-10-20 08:00","重新扫描":"Rescan","项目分型 · 6 个项目":"Project types · 6 projects","健康型":"Healthy","城东 · 华夏 · 市政":"Eastside · Huaxia · Municipal","垫资型":"Advance-funded","低效型":"Inefficient","科技 · 滨江":"Tech · Riverside","高危型":"Critical","文旅":"Cultural Town","综合动态毛利":"Blended dynamic margin","目标 10%":"Target 10%","综合现金流活跃度":"Blended cash activity","分界 1.0":"Cutoff 1.0","项目分型分布":"Project type map","项目经营总览 · 6 个项目":"Portfolio · 6 projects","项目":"Project","诊断":"Diagnosis","回款进度":"Collection progress","付款进度":"Payment progress","现金流":"Cash","动态毛利":"Dynamic margin","风险 / 在办待办":"Risks / open to-dos","文旅小镇二期":"Cultural Town Phase II","滑移":"Slipped","付比收快 18 个点，连续 4 个月净流出；最大问题是业主回款停滞":"Payments run 18 pts ahead of collections, net outflow for 4 months; main issue is stalled owner receipts","收付差18":"Gap 18","活跃度 0.80":"Activity 0.80","科技产业园":"Tech Park","动态毛利 9.5% 低于目标；在途付款申请付后将超结算 180 万":"Dynamic margin 9.5% is below target; in-flight payments would exceed settlement by 1.80m","活跃度 1.10":"Activity 1.10","滨江商业综合体":"Riverside Complex","动态毛利 8.9% 低于目标；计量催办逾期已升级":"Dynamic margin 8.9% is below target; overdue measurement chase has been escalated","活跃度 1.05":"Activity 1.05","城东安置房":"Eastside Resettlement","回款 420 万到账，回款进度重回付款进度之上":"4.20m collected; collection progress is back above payment progress","活跃度 1.12":"Activity 1.12","华夏艺术中心":"Huaxia Arts Center","节奏正常；请款环节 400 万可催":"On pace; 4.00m can be chased at billing","活跃度 1.21":"Activity 1.21","市政道路改造":"Municipal Roadworks","正常":"Normal","活跃度 1.15":"Activity 1.15","演示 V0.5 · 模拟数据 · 金额单位：万元（含税）":"Demo V0.5 · sample data · amounts in CNY 10,000 (tax included)","当前归类：":"Current type:","上期：垫资型 · 本期确认钢材超支后滑入":"Prior: Advance-funded · slipped after this period’s steel overrun was confirmed","处置包：停新增支出 · 高层对账 · 专项盘活":"Response pack: freeze new spend · executive reconciliation · focused cash recovery","挣不挣钱 · 动态毛利":"Is it profitable · dynamic margin","目标毛利 10% · 缺口 3.2 个点":"Target margin 10% · gap 3.2 pts","主因：钢材采购价超目标成本约 210 万；业主变更签证 180 万已报未批。":"Main cause: steel purchases are about 2.10m over target cost; owner variation of 1.80m is submitted and not yet approved.","有没有钱 · 累计净现金流":"Is there cash · cumulative net cash","-980 万":"-980 10k","活跃度":"Activity","· 连续 4 个月净流出":"· net outflow for 4 straight months","主因：业主回款停滞（1,150 万请款未付）；付得比收快 18 个点。":"Main cause: owner receipts are stalled (11.50m billed and unpaid); payments run 18 pts ahead of collections.","目标":"Target","实际":"Actual","预测":"Forecast","累计净现金流":"Cumulative net cash","计划":"Plan","建议模拟":"What-if","A. 变更签证 180 万 11 月获批":"A. Variation of 1.80m approved in Nov","收入 +180 · 1 月毛利 6.3% → 8.1%":"Revenue +180 · Jan margin 6.3% → 8.1%","B. 逾期请款 350 万 11 月催回":"B. Overdue billing of 3.50m collected in Nov","11 月回款 +350 · 累计 -950 → -600":"Nov receipts +350 · cumulative -950 → -600","C. 12 月材料结算 250 万延至 1 月":"C. Dec material settlement of 2.50m deferred to Jan","12 月付款 -250 · 1 月 +250":"Dec payments -250 · Jan +250","基准：1 月累计净现金流 -1,795 · 期末毛利 6.3%":"Baseline: Jan cumulative net cash -1,795 · ending margin 6.3%","采纳并转待办":"Adopt as to-dos","月度台账":"Monthly ledger","月份":"Month","毛利（动态）":"Margin (dynamic)","净现金流（万）":"Net cash (10k)","偏差归因 / 计算要素":"Variance cause / calculation","累计":"cumulative","1月":"Jan","目标成本基线核定":"Target-cost baseline set","权责发生 · 毛利计算过程":"Accrual · margin calculation","收入侧：收入合同 HT-2025-018（1 份）":"Revenue: income contract HT-2025-018 (1)","成本侧：目标成本基线 ReAimCost V1.0 核定":"Cost: target-cost baseline ReAimCost V1.0 set","毛利 = 9,320 − 8,407":"Margin = 9,320 − 8,407","收付实现 · 现金流计算过程":"Cash · cash-flow calculation","回款（收款登记单 ×2）":"Receipts (collection slips ×2)","01-15 预付款 300（SK-1001）· 01-28 进度款 200（SK-1005）":"01-15 advance 300 (SK-1001) · 01-28 progress 200 (SK-1005)","付款（付款登记单 ×2）":"Payments (payment slips ×2)","01-20 劳务 120（FK-2003）· 01-26 钢筋 180（FK-2005）":"01-20 labor 120 (FK-2003) · 01-26 rebar 180 (FK-2005)","当月净 = 500 − 300 · 累计 +200":"Month net = 500 − 300 · cumulative +200","2月":"Feb","签价让利 +0.2 点；现金流符合":"Signed price beat target by 0.2 pts; cash on plan","收入侧：收入合同 9,320（无新批变更）":"Revenue: income contract 9,320 (no newly approved variation)","成本侧：8,407 − 16（劳务分包合同 LD-02 签订价低于目标）+ 6（零星签证）":"Cost: 8,407 − 16 (labor subcontract LD-02 signed below target) + 6 (minor variations)","毛利 = 9,320 − 8,397":"Margin = 9,320 − 8,397","回款（收款登记单 ×1）":"Receipts (collection slips ×1)","02-26 进度款 430（SK-1009）":"02-26 progress 430 (SK-1009)","02-18 劳务 120（FK-2011）· 02-24 模板 180（FK-2014）":"02-18 labor 120 (FK-2011) · 02-24 formwork 180 (FK-2014)","当月净 = 430 − 300 · 累计 +330":"Month net = 430 − 300 · cumulative +330","3月":"Mar","采购节支；付款略早":"Procurement savings; payments slightly early","收入侧：收入合同 9,320":"Revenue: income contract 9,320","成本侧：8,397 − 18（苗木采购合同 CG-07 签订价低于目标）":"Cost: 8,397 − 18 (plants contract CG-07 signed below target)","毛利 = 9,320 − 8,379":"Margin = 9,320 − 8,379","03-12 进度款 400（SK-1012）· 03-28 进度款 220（SK-1015）":"03-12 progress 400 (SK-1012) · 03-28 progress 220 (SK-1015)","付款（付款登记单 ×3）":"Payments (payment slips ×3)","03-10 劳务 150（FK-2018）· 03-19 苗木 200（FK-2021）· 03-27 钢筋 150（FK-2024）":"03-10 labor 150 (FK-2018) · 03-19 plants 200 (FK-2021) · 03-27 rebar 150 (FK-2024)","当月净 = 620 − 500 · 累计 +450":"Month net = 620 − 500 · cumulative +450","4月":"Apr","符合；计量确认延迟":"On plan; measurement confirmation delayed","成本侧：8,379 + 9（砂石采购价差首批确认）":"Cost: 8,379 + 9 (first confirmed aggregate price variance)","毛利 = 9,320 − 8,388":"Margin = 9,320 − 8,388","04-25 进度款 550（SK-1017）":"04-25 progress 550 (SK-1017)","付款（付款登记单 ×4）":"Payments (payment slips ×4)","04-09 劳务 150 · 04-15 砂石 200 · 04-22 塔吊 45 · 04-28 其他 105":"04-09 labor 150 · 04-15 aggregate 200 · 04-22 tower crane 45 · 04-28 other 105","当月净 = 550 − 500 · 累计 +500":"Month net = 550 − 500 · cumulative +500","5月":"May","建材涨价 0.4 点；材料集中采购":"Materials up 0.4 pts; concentrated material buying","成本侧：8,388 + 37（砂石续涨确认）":"Cost: 8,388 + 37 (further aggregate increase confirmed)","毛利 = 9,320 − 8,425":"Margin = 9,320 − 8,425","05-14 进度款 400 · 05-29 进度款 180":"05-14 progress 400 · 05-29 progress 180","付款（付款登记单 ×5 · 材料集中采购）":"Payments (payment slips ×5 · concentrated material buying)","05-08 劳务 150 · 05-13 钢材 350 · 05-20 砂石 120 · 05-23 塔吊 45 · 05-27 其他 35":"05-08 labor 150 · 05-13 steel 350 · 05-20 aggregate 120 · 05-23 tower crane 45 · 05-27 other 35","当月净 = 580 − 700 · 累计 +380":"Month net = 580 − 700 · cumulative +380","6月":"Jun","符合；业主进度款拖 15 天":"On plan; owner progress payment 15 days late","成本侧：8,425 + 19（钢构补充协议 BC-03 调价）":"Cost: 8,425 + 19 (steel supplement BC-03 price adjustment)","毛利 = 9,320 − 8,444":"Margin = 9,320 − 8,444","06-27 进度款 460（约定 06-12，拖 15 天）":"06-27 progress 460 (due 06-12, 15 days late)","06-10 劳务 150 · 06-16 钢材 400 · 06-22 塔吊 45 · 06-29 其他 125":"06-10 labor 150 · 06-16 steel 400 · 06-22 tower crane 45 · 06-29 other 125","当月净 = 460 − 720 · 累计 +120":"Month net = 460 − 720 · cumulative +120","7月":"Jul","符合；回款持续低于计划":"On plan; receipts stay below plan","成本侧：8,444 + 19（塔吊续租合同 ZL-11）":"Cost: 8,444 + 19 (tower-crane extension ZL-11)","毛利 = 9,320 − 8,463":"Margin = 9,320 − 8,463","07-26 进度款 480":"07-26 progress 480","07-08 劳务 150 · 07-15 混凝土 300 · 07-21 钢构 180 · 07-25 塔吊 50":"07-08 labor 150 · 07-15 concrete 300 · 07-21 steelwork 180 · 07-25 tower crane 50","当月净 = 480 − 680 · 累计 -80":"Month net = 480 − 680 · cumulative -80","8月":"Aug","钢材调涨 0.6 点未预估；符合修正预期":"Steel up 0.6 pts, not in the forecast; matches the revised view","成本侧：8,463 + 37（钢材价差首批确认，采购价超目标）":"Cost: 8,463 + 37 (first steel variance confirmed; buy price above target)","毛利 = 9,320 − 8,500":"Margin = 9,320 − 8,500","08-13 进度款 300 · 08-28 进度款 220":"08-13 progress 300 · 08-28 progress 220","08-08 劳务 150 · 08-14 钢构 250 · 08-21 塔吊 45 · 08-29 其他 175":"08-08 labor 150 · 08-14 steelwork 250 · 08-21 tower crane 45 · 08-29 other 175","当月净 = 520 − 620 · 累计 -180":"Month net = 520 − 620 · cumulative -180","9月":"Sep","价差扩大＋签证未批；业主款 800 未兑现":"Variance widened and variation unapproved; owner payment of 800 not received","收入侧：9,320 + 已批变更 0（签证单 QZ-1801 已报未批·不计）":"Revenue: 9,320 + approved variations 0 (variation QZ-1801 submitted, not approved, excluded)","成本侧：8,500 + 84（钢材价差续确认）":"Cost: 8,500 + 84 (further steel variance confirmed)","毛利 = 9,320 − 8,584":"Margin = 9,320 − 8,584","09-26 进度款 380（业主款 800 未兑现）":"09-26 progress 380 (owner payment of 800 not received)","09-09 劳务 150 · 09-17 钢材 200 · 09-25 混凝土 180":"09-09 labor 150 · 09-17 steel 200 · 09-25 concrete 180","当月净 = 380 − 530 · 累计 -330":"Month net = 380 − 530 · cumulative -330","10月":"Oct","钢材调涨未传导；回款少 300＋付款多 150":"Steel increase not passed on; receipts short 300 and payments over by 150","收入侧：收入合同 9,320 + 已批变更 0":"Revenue: income contract 9,320 + approved variations 0","成本侧：8,584 + 106（砂石价差 +40 · 塔吊续租 +20 · 钢材价差 +46）":"Cost: 8,584 + 106 (aggregate variance +40 · crane extension +20 · steel variance +46)","累计变动 +283（基线 8,407）：劳务签价 -16 · 苗木签价 -18 · 砂石价差 +86 · 钢构补充协议 +19 · 塔吊 +39 · 钢材价差 +167 · 其他零星 +6（全周期钢材价差预估 210，已确认 167）":"Cumulative change +283 (baseline 8,407): labor price -16 · plants price -18 · aggregate variance +86 · steel supplement +19 · crane +39 · steel variance +167 · other +6 (full-cycle steel variance estimated 210, confirmed 167)","毛利 = 9,320 − 8,690":"Margin = 9,320 − 8,690","10-08 进度款 250（SK-1018）· 10-25 结算款 150（SK-1022）":"10-08 progress 250 (SK-1018) · 10-25 settlement 150 (SK-1022)","付款（付款登记单 ×6）":"Payments (payment slips ×6)","10-05 劳务工资 260 · 10-08 混凝土 180 · 10-12 钢结构争议先付 220 · 10-15 塔吊 45 · 10-20 景观预付款 150 · 10-28 模板 195":"10-05 labor wages 260 · 10-08 concrete 180 · 10-12 disputed steel advance 220 · 10-15 tower crane 45 · 10-20 landscape advance 150 · 10-28 formwork 195","当月净 = 400 − 1,050 · 累计 -980":"Month net = 400 − 1,050 · cumulative -980","本月回款":"Receipts this month","万":"10k","计划 1,200 · 达成 33%":"Plan 1,200 · 33% achieved","本月付款":"Payments this month","计划 900 · 超 17%":"Plan 900 · 17% over","本月净现金流":"Net cash this month","累计净现金流 -980":"Cumulative net cash -980","收":"In","产值":"Output","计量":"Measured","卡 800":"Stuck 800","结算":"Settled","卡 500":"Stuck 500","请款":"Billed","卡 540":"Stuck 540","回款":"Collected","卡 1,150":"Stuck 1,150","净现金流":"Net cash","连续净流出":"Straight net outflow","4 个月":"4 months","签约测算垫资峰值 -500 · 已超近 1 倍":"Contracted funding-gap peak -500 · nearly 2× over","支":"Out","合同":"Contract","付款":"Paid","反超 590":"Over by 590","回款进度（3,910 ÷ 收入合同 9,320）":"Collection progress (3,910 ÷ income contract 9,320)","付款进度（4,890 ÷ 支出合同 8,150）":"Payment progress (4,890 ÷ cost contracts 8,150)","18 个点":"18 pts","付款超回款":"Payments ahead of collections","收入管理":"Revenue","文旅小镇二期 · 收入合同（含变更）9,320 · 回款进度 42%":"Cultural Town Phase II · income contract incl. variations 9,320 · collection 42%","环节":"Stage","累计金额":"Cumulative","较上级滞留":"Stuck vs prior stage","滞留内容":"What is stuck","经办/对方":"Owner / counterparty","滞留天数":"Days stuck","产值确认":"Output confirmed","本月产值已确认":"This month’s output is confirmed","9 月计量 800 未确认":"Sep measurement of 800 is unconfirmed","张三（施工员）":"Zhang San (site engineer)","12 天":"12 days","催办":"Chase","二季度结算业主审核中":"Q2 settlement is in owner review","业主造价部":"Owner QS","20 天":"20 days","待结算完成后开具":"Issue after settlement is complete","请款已开未付，最长挂账 62 天":"Billed and unpaid, longest open 62 days","业主财务部":"Owner finance","62 天":"62 days","发催款函":"Send collection letter","支出管理":"Cost","文旅小镇二期 · 38 份支出合同 · 异常置顶":"Cultural Town Phase II · 38 cost contracts · exceptions first","合同（含变更）":"Contract (incl. variations)","累计计量":"Measured to date","累计结算":"Settled to date","累计付款":"Paid to date","反超结算 590":"Paid 590 over settlement","类型":"Type","合同额":"Contract amount","状态":"Status","管控建议":"Control action","钢结构专业分包":"Steelwork subcontract","专业分包":"Specialist subcontract","反超 320":"Over by 320","先付已确认 220，限 5 天补办结算":"Pay the confirmed 220 first; settle the rest within 5 days","混凝土采购":"Concrete supply","材料采购":"Material purchase","反超 270":"Over by 270","账期可谈：建议缓付 100 万至 11 月":"Terms are negotiable: defer 1.00m to Nov","景观绿化分包":"Landscape subcontract","预付款":"Advance","未开工预付款：建议缓至回款后":"Advance before work starts: defer until receipts arrive","劳务分包（钢筋班）":"Labor subcontract (rebar crew)","劳务":"Labor","工资刚性：按期支付":"Wages are must-pay: pay on time","塔吊租赁":"Tower-crane hire","设备租赁":"Equipment hire","租金刚性：不付即停工":"Hire is must-pay: non-payment stops the crane","其余 33 份合计":"Other 33 contracts combined","付款调度":"Payments","文旅小镇二期 · 以收定支":"Cultural Town Phase II · pay only from receipts","本期申请 955，实付 605、缓付 350 —— 刚性保进度、可谈争时间、无据催手续":"Requested 955 this period: pay 605, defer 350 — must-pay keeps the job moving, negotiable items buy time, weak-basis items wait on paperwork","依据：11 月业主款 800（QS-2091）到账前资金最紧，累计净现金流 -980；缓付 350 于该笔回款到账后恢复。":"Basis: cash is tightest before the Nov owner receipt of 800 (QS-2091); cumulative net cash is -980. The deferred 350 is released after that receipt.","本期付款调度 · 10-19 已下达 · 通盘扫描 38 份合同":"This period’s payment plan · issued 10-19 · 38 contracts scanned","付款申请":"Payment request","金额":"Amount","档位":"Tier","判定依据":"Basis","调度动作":"Action","待办":"To-do","农民工工资":"Migrant wages","刚性":"Must-pay","劳务付款专户单据":"Labor payment escrow documents","照常支付":"Pay as scheduled","塔吊租金":"Tower-crane rent","设备租赁合同":"Equipment hire contract","混凝土材料款":"Concrete material payment","可协商":"Negotiable","材料采购 + 账期标签":"Material purchase + payment-term tag","先付 80，100 万谈至 11 月":"Pay 80 now; negotiate 1.00m to Nov","钢结构进度款":"Steelwork progress payment","依据不足":"Weak basis","结算未办理":"Settlement not filed","景观预付款":"Landscape advance","非紧急":"Not urgent","工程未启动":"Work not started","缓至 11 月回款后":"Defer until the Nov receipt","查看调度待办":"View payment to-dos","上期反馈：9 月缓付 2 笔共 260 万，其中 140 万已于 10 月 8 日业主回款后恢复放行":"Prior feedback: 2 deferrals in Sep totaling 2.60m; 1.40m was released on Oct 8 after the owner receipt","风险清单":"Risks","级别":"Level","条线":"Line","内容":"Detail","待办事项":"To-dos","事项":"Item","对应风险":"Linked risk","责任人":"Owner","期限":"Due","轮次":"Round","最近反馈":"Latest feedback","科技":"Tech Park","滨江":"Riverside","城东":"Eastside","华夏":"Huaxia","市政":"Municipal","收入":"Revenue","业主回款停滞 1,150":"Owner receipts stalled 1,150","请款 1,150 万最长挂账 62 天，业主回款停滞":"11.50m billed, longest open 62 days; owner receipts stalled","建议：发正式催款函并升级公司层面":"Suggestion: send a formal collection letter and escalate to company level","发正式催款函，升级公司层面对接业主":"Send a formal collection letter and escalate owner contact to company level","王五 · 商务":"Wang Wu · Commercial","10-27 前":"by 10-27","累计净现金流 -980，连续 4 个月净流出，超签约测算垫资峰值近 1 倍":"Cumulative net cash -980, net outflow for 4 months, nearly 2× the contracted funding-gap peak","支出":"Spend","付款超结算 590":"Payments exceed settlement by 590","付款超结算 590 万（钢结构 320 · 混凝土 270）":"Payments exceed settlement by 5.90m (steelwork 320 · concrete 270)","动态毛利降至 6.8%":"Dynamic margin down to 6.8%","钢材采购价超目标成本约 210 万，签证 180 万已报 45 天未批，动态毛利降至 6.8%":"Steel purchases are about 2.10m over target cost; variation of 1.80m has been submitted for 45 days without approval; dynamic margin is down to 6.8%","在途付款超结算 180":"In-flight payments exceed settlement by 180","在途 320 万付款申请付后将超结算 180 万":"In-flight payment requests of 3.20m would exceed settlement by 1.80m if paid","建议：先付已确认部分，其余待计量补办":"Suggestion: pay the confirmed portion first; complete measurement for the rest","320 万申请先付已确认部分，补办计量":"On the 3.20m request, pay the confirmed portion and complete measurement","刘七 · 商务":"Liu Qi · Commercial","10-24 前":"by 10-24","9 月计量未确认 550":"Sep measurement unconfirmed 550","9 月计量 550 万未确认":"Sep measurement of 5.50m is unconfirmed","回款 420 未到账":"Receipt of 420 not received","回款 420 万逾期未到账":"Receipt of 4.20m is overdue and not received","待处理":"Open","催办 9 月计量 550 万":"Chase Sep measurement of 5.50m","张三 · 施工员":"Zhang San · Site engineer","已逾期 1 天":"1 day overdue","第 2 轮":"Round 2","未办理，已升级商务经理":"Not done; escalated to the commercial manager","逾期":"Overdue","项目诊断":"Diagnosis","催业主确认变更签证 180 万":"Ask the owner to approve the 1.80m variation","剩 5 天":"5 days left","第 1 轮":"Round 1","已读未复":"Read, no reply","在办":"In progress","钢结构先付已确认 220，补办结算":"Pay confirmed steelwork 220 first, then complete settlement","李四 · 预算员":"Li Si · Cost engineer","剩 4 天":"4 days left","资料已齐，预计周三办完":"Documents are complete; expected done Wednesday","缓付景观预付款 150 万至 11 月回款后":"Defer the 1.50m landscape advance until the Nov receipt","赵六 · 财务":"Zhao Liu · Finance","11 月回款后复检":"Recheck after the Nov receipt","已与供应商沟通，对方接受":"Supplier contacted and has agreed","混凝土材料款先付 80，100 万谈至 11 月":"Pay 80 of the concrete bill now; negotiate 1.00m to Nov","供应商同意 11 月支付":"Supplier agreed to be paid in Nov","催办回款 420 万":"Chase the 4.20m receipt","已关闭":"Closed","10 月 8 日到账，收付差消除":"Received on Oct 8; collection gap closed","已办结":"Done","公司":"Company","公司总览":"Overview","全部项目":"All projects","查看":"View","转待办":"Make to-do","待办逾期：":"Overdue to-do: ","暂无待处理":"Nothing open","待办逾期":"Overdue to-do","待办跟踪":"Tracking","查看待办":"View to-dos","红":"Red","橙":"Amber","无未关闭风险":"No open risks","条未关闭":"open","按级别排序":"by severity","暂无待办事项":"No to-dos","下达":"issued from","办结":"Done","已推送":"Sent","读取项目档案":"Read project files","6 个在施项目":"6 live projects","读取收支合同":"Read income and cost contracts","收入合同 6 份 · 支出合同 150 份":"6 income contracts · 150 cost contracts","读取收付款与在途单据":"Read receipts, payments and in-flight documents","在途 23 笔":"23 in flight","计算动态毛利与净现金流":"Calculate dynamic margin and net cash","6 个项目":"6 projects","四象限分型":"Classify into four types","健康 3 · 低效 2 · 高危 1":"Healthy 3 · Inefficient 2 · Critical 1","生成待处理与待办事项":"Build open items and to-dos","新发现 3 项异常":"3 new exceptions","目标毛利 10%":"Target margin 10%","活跃度 1.0":"Activity 1.0","动态毛利 →":"Dynamic margin →","↑ 现金流活跃度":"↑ Cash activity","8 月起钢材超支显现":"Steel overrun visible from Aug","签约测算垫资峰值 -500":"Contracted funding-gap peak -500","11月":"Nov","12月":"Dec","已确认":"Confirmed","节点已到":"Milestone due","节点未到":"Milestone not due","钢材价差余量传导":"Remaining steel-price variance","QS-2091 请款（业主已确认）":"QS-2091 billing (owner confirmed)","10 月进度款（计量节点已到）":"Oct progress payment (measurement milestone due)","11 月进度款":"Nov progress payment","12 月进度款":"Dec progress payment","材料":"Materials","租赁":"Hire","10-19 缓付恢复（混凝土 100 · 钢结构 100 · 景观 150）":"10-19 deferrals released (concrete 100 · steelwork 100 · landscape 150)","农民工工资（刚性）":"Migrant wages (must-pay)","材料结算":"Material settlement","劳务（刚性）":"Labor (must-pay)","变更签证 180 获批（A）":"Variation of 1.80m approved (A)","逾期请款 350 催回并确认（B）":"Overdue billing of 3.50m collected and confirmed (B)","12 月材料结算延至本月（C）":"Dec material settlement moved to this month (C)","材料结算 250 延至 1 月（C）":"Material settlement of 2.50m deferred to Jan (C)","超签约测算垫资峰值":"above the contracted funding-gap peak","权责发生 · 毛利预测":"Accrual · margin forecast","收入（合同 + 已批变更）":"Revenue (contract + approved variations)","预计总成本":"Expected total cost","收付实现 · 现金流预测":"Cash · cash-flow forecast","当月净":"Month net","毛利":"Margin","成本":"Cost","基准":"Baseline","模拟":"What-if","期末毛利":"ending margin","催收逾期请款 350 万，11 月内业主确认回款":"Collect the overdue billing of 3.50m; owner confirms receipt within Nov","11-30 前":"by 11-30","12 月材料款 250 万延至 1 月支付":"Defer the Dec material payment of 2.50m to Jan","12-10 前":"by 12-10"};
+function tr(s){
+  if(s==null||s==='')return s;
+  var k=String(s);
+  if(LANG!=='en')return k;
+  return Object.prototype.hasOwnProperty.call(EN,k)?EN[k]:k;
+}
+function syncLangBtns(){
+  [].forEach.call(document.querySelectorAll('[data-lang-btn]'),function(b){
+    b.classList.toggle('on', b.getAttribute('data-lang-btn')===LANG);
+  });
+}
+function applyI18n(root){
+  root=root||document.body;
+  var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null);
+  var list=[],n;
+  while((n=walker.nextNode())) list.push(n);
+  list.forEach(function(node){
+    var p=node.parentElement;
+    if(!p||p.closest('script,style,[data-no-i18n]'))return;
+    if(node.__i18nSrc==null) node.__i18nSrc=node.nodeValue;
+    var raw=node.__i18nSrc, core=raw.trim();
+    if(!core)return;
+    var lead=raw.match(/^\s*/)[0], trail=raw.match(/\s*$/)[0];
+    var out=(LANG==='en'&&Object.prototype.hasOwnProperty.call(EN,core))?EN[core]:core;
+    node.nodeValue=lead+out+trail;
+  });
+  document.title=tr('项目经营资金助手 · 工作台');
+  document.documentElement.lang=LANG==='en'?'en':'zh-CN';
+}
+function paintScanTime(){
+  var el=document.getElementById('scanTime');
+  if(!el)return;
+  el.textContent=tr('扫描完成')+' '+(el.getAttribute('data-time')||'');
+}
+function relabelScan(){
+  var ul=document.getElementById('cvSteps');
+  if(!ul)return;
+  [].forEach.call(ul.children,function(li,i){
+    if(typeof SCAN_STEPS==='undefined'||!SCAN_STEPS[i])return;
+    var span=li.querySelector('span'), b=li.querySelector('b');
+    if(span) span.textContent=tr(SCAN_STEPS[i][0]);
+    if(b) b.textContent=tr(SCAN_STEPS[i][1]);
+  });
+}
+function setLang(lang){
+  LANG=lang==='en'?'en':'zh';
+  try{localStorage.setItem('fa-lang',LANG);}catch(e){}
+  document.documentElement.lang=LANG==='en'?'en':'zh-CN';
+  drawScatter();
+  simRecalc();
+  renderAll();
+  relabelScan();
+  applyI18n(document.body);
+  paintScanTime();
+  syncLangBtns();
+}
+/* ---------- 项目、风险、待办事项：单一数据源 ----------
+   每条待办都指向它要解决的风险（r）；org = 在哪里下达（待处理 / 项目诊断 / 付款调度）
+   风险状态由其待办推出：无待办 = 待处理，有逾期 = 待办逾期，否则 = 待办跟踪
+   首页「待处理」= 无待办的风险 + 逾期待办 */
+var PJ=[{n:'文旅小镇二期',s:'文旅',q:'r',full:true},{n:'科技产业园',s:'科技',q:'o'},{n:'滨江商业综合体',s:'滨江',q:'o'},{n:'城东安置房',s:'城东',q:'g'},{n:'华夏艺术中心',s:'华夏',q:'g'},{n:'市政道路改造',s:'市政',q:'g'}];
+var QC={r:'var(--red)',o:'var(--orange)',g:'var(--green)',b:'var(--blue)'},QN={r:'高危型',o:'低效型',g:'健康型',b:'垫资型'};
+var RISKS=[
+  {id:'R1',p:'文旅小镇二期',line:'收入',lv:'red',nm:'业主回款停滞 1,150',txt:'请款 1,150 万最长挂账 62 天，业主回款停滞',amt:1150,todo:'建议：发正式催款函并升级公司层面',go:'incomeView',
+   tpl:['发正式催款函，升级公司层面对接业主','王五 · 商务','10-27 前']},
+  {id:'R2',p:'文旅小镇二期',line:'现金流',lv:'red',nm:'累计净现金流 -980',txt:'累计净现金流 -980，连续 4 个月净流出，超签约测算垫资峰值近 1 倍',amt:980},
+  {id:'R3',p:'文旅小镇二期',line:'支出',lv:'red',nm:'付款超结算 590',txt:'付款超结算 590 万（钢结构 320 · 混凝土 270）',amt:590},
+  {id:'R4',p:'文旅小镇二期',line:'毛利',lv:'orange',nm:'动态毛利降至 6.8%',txt:'钢材采购价超目标成本约 210 万，签证 180 万已报 45 天未批，动态毛利降至 6.8%',amt:210},
+  {id:'R5',p:'科技产业园',line:'支出',lv:'red',nm:'在途付款超结算 180',txt:'在途 320 万付款申请付后将超结算 180 万',amt:320,todo:'建议：先付已确认部分，其余待计量补办',
+   tpl:['320 万申请先付已确认部分，补办计量','刘七 · 商务','10-24 前']},
+  {id:'R6',p:'滨江商业综合体',line:'收入',lv:'orange',nm:'9 月计量未确认 550',txt:'9 月计量 550 万未确认',amt:550},
+  {id:'R0',p:'城东安置房',line:'收入',lv:'orange',nm:'回款 420 未到账',txt:'回款 420 万逾期未到账',amt:420,closed:true}];
+var TASKS=[
+  {id:'T1',p:'滨江商业综合体',r:'R6',org:'待处理',d:'10-13',txt:'催办 9 月计量 550 万',who:'张三 · 施工员',due:'已逾期 1 天',round:'第 2 轮',fb:'未办理，已升级商务经理',st:'逾期'},
+  {id:'T2',p:'文旅小镇二期',r:'R4',org:'项目诊断',d:'10-15',txt:'催业主确认变更签证 180 万',who:'王五 · 商务',due:'剩 5 天',round:'第 1 轮',fb:'已读未复',st:'在办'},
+  {id:'T3',p:'文旅小镇二期',r:'R3',org:'付款调度',d:'10-19',txt:'钢结构先付已确认 220，补办结算',who:'李四 · 预算员',due:'剩 4 天',round:'第 1 轮',fb:'资料已齐，预计周三办完',st:'在办'},
+  {id:'T4',p:'文旅小镇二期',r:'R2',org:'付款调度',d:'10-19',txt:'缓付景观预付款 150 万至 11 月回款后',who:'赵六 · 财务',due:'11 月回款后复检',round:'第 1 轮',fb:'已与供应商沟通，对方接受',st:'在办'},
+  {id:'T6',p:'文旅小镇二期',r:'R2',org:'付款调度',d:'10-19',txt:'混凝土材料款先付 80，100 万谈至 11 月',who:'赵六 · 财务',due:'11 月回款后复检',round:'第 1 轮',fb:'供应商同意 11 月支付',st:'在办'},
+  {id:'T5',p:'城东安置房',r:'R0',org:'待处理',d:'09-28',txt:'催办回款 420 万',who:'—',due:'已关闭',round:'第 2 轮',fb:'10 月 8 日到账，收付差消除',st:'已办结'}];
+function pj(n){for(var i=0;i<PJ.length;i++){if(PJ[i].n===n)return PJ[i]}}
+function inScope(x,p){return !p||x.p===p}
+function risksOf(p){return RISKS.filter(function(r){return !r.closed&&inScope(r,p)})}
+function tasksOf(p){return TASKS.filter(function(t){return inScope(t,p)})}
+function openTasks(p){return tasksOf(p).filter(function(t){return t.st!=='已办结'})}
+function taskById(id){for(var i=0;i<TASKS.length;i++){if(TASKS[i].id===id)return TASKS[i]}}
+function riskById(id){for(var i=0;i<RISKS.length;i++){if(RISKS[i].id===id)return RISKS[i]}}
+function tasksOfRisk(rid){return TASKS.filter(function(t){return t.r===rid})}
+function todosOf(p){
+  var a=risksOf(p).filter(function(r){return !tasksOfRisk(r.id).length}).map(function(r){return {k:'r',x:r,p:r.p,lv:r.lv}});
+  return a.concat(tasksOf(p).filter(function(t){return t.st==='逾期'}).map(function(t){return {k:'t',x:t,p:t.p,lv:'red'}}));
+}
+
+/* ---------- 导航：范围（公司 / 某项目）+ 页面 ---------- */
+var VN={companyView:'公司总览',projectView:'项目诊断',incomeView:'收入管理',expenseView:'支出管理',cashflowView:'付款调度',risksView:'风险清单',tasksView:'待办事项'};
+var PJ_VIEWS=['projectView','incomeView','expenseView','cashflowView'];
+var cur='companyView',curProj=null,hl=[];
+function nav(view,proj,hlIds){
+  curProj=view==='companyView'?null:(proj||null);hl=hlIds||[];
+  document.getElementById(cur).classList.remove('on');document.getElementById(view).classList.add('on');cur=view;window.scrollTo(0,0);
+  renderAll();
+}
+function showView(id){nav(id,PJ_VIEWS.indexOf(id)>-1?(curProj||PJ[0].n):curProj)}
+function showCompany(){nav('companyView',null)}
+function openProj(n){var p=pj(n);nav(p.full?'projectView':'risksView',n)}
+function renderSide(){
+  var h='<div class="sg">'+tr('公司')+'</div>'+si('companyView',null,tr('公司总览'),'')+si('risksView',null,tr('风险清单'),risksOf().length)+si('tasksView',null,tr('待办事项'),openTasks().length);
+  h+='<div class="sg">'+tr('项目')+' · '+PJ.length+'</div>';
+  PJ.forEach(function(p){
+    var open=curProj===p.n,td=todosOf(p.n).length;
+    h+='<div class="si proj'+(open?' open':'')+'" onclick="openProj(\''+p.n+'\')"><i class="car">▶</i><span class="qd" style="background:'+QC[p.q]+'"></span>'+tr(p.n)+(td?'<span class="ct r">'+td+'</span>':'')+'</div>';
+    if(open){
+      if(p.full){PJ_VIEWS.forEach(function(v){h+=si(v,p.n,tr(VN[v]),'',true)})}
+      h+=si('risksView',p.n,tr('风险清单'),risksOf(p.n).length,true)+si('tasksView',p.n,tr('待办事项'),openTasks(p.n).length,true);
+    }
+  });
+  document.getElementById('side').innerHTML=h;
+}
+function si(v,p,label,ct,kid){
+  var on=cur===v&&curProj===p;
+  return '<div class="si'+(kid?' kid':'')+(on?' on':'')+'" onclick="nav(\''+v+'\','+(p?'\''+p+'\'':'null')+')">'+label+(ct!==''?'<span class="ct">'+ct+'</span>':'')+'</div>';
+}
+function renderCrumbs(){
+  var h='<a onclick="showCompany()">'+tr('全部项目')+'</a>';
+  if(curProj){h+='<i>›</i><a onclick="openProj(\''+curProj+'\')">'+tr(curProj)+'</a>'}
+  if(cur!=='companyView'){h+='<i>›</i>'+tr(VN[cur])}
+  document.getElementById('crumbs').innerHTML=h;
+}
+
+/* ---------- 列表渲染 ---------- */
+function todoRow(t,grp){
+  var x=t.x,b;
+  if(t.k==='r'){
+    b=(x.go?'<button class="btn" onclick="event.stopPropagation();nav(\''+x.go+'\',\''+x.p+'\')">'+tr('查看')+'</button>':'')+'<button class="btn primary" onclick="event.stopPropagation();toTask(\''+x.id+'\')">'+tr('转待办')+'</button>';
+    return '<div class="todo"><i class="'+x.lv+'"></i><p>'+tr(x.txt)+'<small>'+tr(x.todo)+'</small></p><div class="acts">'+b+'</div></div>';
+  }
+  return '<div class="todo"><i class="red"></i><p>'+tr('待办逾期：')+tr(x.txt)+'<small>'+tr(x.who)+' · '+tr(x.due)+' · '+tr(x.fb)+'</small></p><div class="acts"><button class="btn" onclick="event.stopPropagation();nav(\'tasksView\',\''+x.p+'\',[\''+x.id+'\'])">'+tr('查看')+'</button></div></div>';
+}
+function renderTodos(){
+  var all=todosOf(),h='<h2>'+tr('待处理')+' · '+all.length+'</h2>';
+  PJ.forEach(function(p){
+    var list=todosOf(p.n);if(!list.length)return;
+    h+='<div class="tgrp" onclick="openProj(\''+p.n+'\')"><span class="qtag '+p.q+'">'+tr(QN[p.q])+'</span>'+tr(p.n)+' · '+list.length+'</div>';
+    list.forEach(function(t){h+=todoRow(t,true)});
+  });
+  if(!all.length){h+='<div class="empty">'+tr('暂无待处理')+'</div>'}
+  document.getElementById('coTodos').innerHTML=h;
+  var mine=todosOf(curProj||PJ[0].n),ph='<h2>'+tr('待处理')+' · '+mine.length+'</h2>';
+  mine.forEach(function(t){ph+=todoRow(t)});
+  if(!mine.length){ph+='<div class="empty">'+tr('暂无待处理')+'</div>'}
+  document.getElementById('pjTodos').innerHTML=ph;
+}
+function renderRisks(){
+  var list=risksOf(curProj).slice().sort(function(a,b){return (a.lv==='red'?0:1)-(b.lv==='red'?0:1)}),h='';
+  list.forEach(function(r){
+    var ts=tasksOfRisk(r.id),st,b;
+    if(ts.length){
+      var late=ts.some(function(t){return t.st==='逾期'}),ids=ts.map(function(t){return "'"+t.id+"'"}).join(',');
+      st=late?'<span class="tag red">'+tr('待办逾期')+'</span>':'<span class="tag blue">'+tr('待办跟踪')+' · '+ts.length+'</span>';
+      b='<button class="btn" onclick="nav(\'tasksView\',\''+r.p+'\',['+ids+'])">'+tr('查看待办')+'</button>'}
+    else{st='<span class="tag orange">'+tr('待处理')+'</span>';b='<button class="btn primary" onclick="toTask(\''+r.id+'\')">'+tr('转待办')+'</button>'}
+    h+='<tr'+(hl.indexOf(r.id)>-1?' class="new"':'')+'><td><span class="tag '+r.lv+'">'+tr(r.lv==='red'?'红':'橙')+'</span></td><td>'+tr(r.p)+'</td><td><span class="tag gray">'+tr(r.line)+'</span></td><td class="diag">'+tr(r.txt)+'</td><td class="num">'+r.amt.toLocaleString('en-US')+'</td><td>'+st+'</td><td>'+b+'</td></tr>';
+  });
+  if(!list.length){h='<tr><td colspan="7" class="empty">'+tr('无未关闭风险')+'</td></tr>'}
+  document.getElementById('riskBody').innerHTML=h;
+  setT('riskSum',tr(curProj||'全部项目')+' · '+list.length+' '+tr('条未关闭')+' · '+tr('按级别排序'));
+}
+function renderTasks(){
+  var ord={'逾期':0,'在办':1,'已办结':2},list=tasksOf(curProj).slice().sort(function(a,b){return ord[a.st]-ord[b.st]}),h='',c={'在办':0,'逾期':0,'已办结':0};
+  var lp=LANG==='en'?' (':'（', rp=LANG==='en'?')':'）';
+  list.forEach(function(t){
+    c[t.st]++;var done=t.st==='已办结',tc=t.st==='逾期'?'red':done?'green':'orange';
+    var r=riskById(t.r),rk=r.closed?'<span class="rk off">'+tr(r.nm)+'</span>':'<a class="rk" onclick="nav(\'risksView\',\''+r.p+'\',[\''+r.id+'\'])">'+tr(r.nm)+'</a>';
+    h+='<tr'+(hl.indexOf(t.id)>-1?' class="new"':'')+'><td class="diag"'+(done?' style="color:var(--muted)"':'')+'>'+tr(t.txt)+lp+tr(pj(t.p).s)+rp+'</td><td><span class="tag gray">'+tr(r.line)+'</span> '+rk+'<small class="org">'+t.d+' · '+tr('下达')+' '+tr(t.org)+'</small></td><td>'+tr(t.who)+'</td><td'+(t.st==='逾期'?' style="color:var(--red)"':done?' style="color:var(--muted)"':'')+'>'+tr(t.due)+'</td><td>'+tr(t.round)+'</td><td class="diag">'+tr(t.fb)+'</td><td><span class="tag '+tc+'">'+tr(t.st)+'</span></td></tr>';
+  });
+  if(!list.length){h='<tr><td colspan="7" class="empty">'+tr('暂无待办事项')+'</td></tr>'}
+  document.getElementById('taskBody').innerHTML=h;
+  setT('taskSum',tr(curProj||'全部项目')+' · '+tr('在办')+' '+c['在办']+' · '+tr('逾期')+' '+c['逾期']+' · '+tr('办结')+' '+c['已办结']);
+}
+function renderBadges(){
+  var rows=document.querySelectorAll('#ovTable tbody tr');
+  PJ.forEach(function(p,i){
+    var r=risksOf(p.n).length,t=openTasks(p.n).length;
+    rows[i].onclick=function(){openProj(p.n)};
+    rows[i].lastElementChild.innerHTML='<span class="badge '+(r?'red':'gray')+'">'+r+'</span> <span class="badge gray">'+t+'</span>';
+  });
+}
+function renderDispatch(){
+  [].forEach.call(document.querySelectorAll('.cft[data-t]'),function(c){
+    var t=taskById(c.getAttribute('data-t'));
+    c.innerHTML=tr(t.who).split(' · ')[0]+' <span class="tag '+(t.st==='逾期'?'red':t.st==='已办结'?'green':'orange')+'">'+tr(t.st)+'</span>';
+  });
+}
+function renderAll(){renderSide();renderCrumbs();renderTodos();renderRisks();renderTasks();renderBadges();renderDispatch()}
+
+/* 待处理 → 转待办（派给责任人、带期限），风险转入待办跟踪 */
+var tSeq=7;
+function addTask(rid,org,tpl){
+  var r=riskById(rid),id='T'+(tSeq++);
+  TASKS.unshift({id:id,p:r.p,r:rid,org:org,d:'10-20',txt:tpl[0],who:tpl[1],due:tpl[2],round:'第 1 轮',fb:'已推送',st:'在办'});
+  return id;
+}
+function toTask(rid){var r=riskById(rid);nav('tasksView',r.p,[addTask(rid,'待处理',r.tpl)])}
+
+/* 封面扫描：逐步读取与计算，完成后进入公司首页 */
+var SCAN_STEPS=[['读取项目档案','6 个在施项目'],['读取收支合同','收入合同 6 份 · 支出合同 150 份'],['读取收付款与在途单据','在途 23 笔'],['计算动态毛利与净现金流','6 个项目'],['四象限分型','健康 3 · 低效 2 · 高危 1'],['生成待处理与待办事项','新发现 3 项异常']];
+function startScan(){
+  var cv=document.getElementById('cover'),ul=document.getElementById('cvSteps'),bar=document.getElementById('cvBar');
+  ul.innerHTML=SCAN_STEPS.map(function(s){return '<li><i></i><span>'+tr(s[0])+'</span><b>'+tr(s[1])+'</b></li>'}).join('');
+  bar.style.width='0';cv.classList.remove('hide','fin');cv.classList.add('run');document.body.style.overflow='hidden';
+  var li=ul.children,i=0;
+  (function next(){
+    if(i>0){li[i-1].className='done';li[i-1].firstChild.textContent='✓'}
+    if(i===SCAN_STEPS.length){
+      bar.style.width='100%';cv.classList.add('fin');
+      var d=new Date(),hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      document.getElementById('scanTime').setAttribute('data-time','2026-10-20 '+hm);paintScanTime();
+      setTimeout(function(){showCompany();cv.classList.add('hide');cv.classList.remove('run');document.body.style.overflow=''},800);
+      return}
+    li[i].className='run';bar.style.width=((i+1)/SCAN_STEPS.length*100)+'%';i++;
+    setTimeout(next,550+Math.random()*400);
+  })();
+}
+function tglDet(r){var d=r.nextElementSibling;if(d&&d.className==='det'){d.style.display=d.style.display==='table-row'?'none':'table-row'}}
+function setT(id,v){document.getElementById(id).textContent=v}
+function fmt(v){return (v>0?'+':'')+v.toLocaleString('en-US')}
+
+/* ---------- SVG 绘图 ---------- */
+var C={ink:'#1b2b3a',muted:'#76869a',grid:'#edf1f5',ref:'#9aa8b6',red:'#cf4339',orange:'#c7861c',green:'#1f8a5b',blue:'#2a64a3',teal:'#1f8a5b',sim:'#7550c4'};
+function el(p,tag,a,txt){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in a){e.setAttribute(k,a[k])}if(txt!=null){e.textContent=txt}p.appendChild(e);return e}
+function txt(p,x,y,s,o){o=o||{};return el(p,'text',{x:x,y:y,'font-size':o.size||12,fill:o.fill||C.muted,'text-anchor':o.anchor||'start','font-weight':o.weight||400},s)}
+
+/* 项目分型散点：横轴动态毛利，纵轴现金流活跃度 */
+var PROJ=[['文旅',6.8,0.80,15],['滨江',8.9,1.05,12],['科技',9.5,1.10,12],['城东',10.2,1.12,11],['华夏',11.5,1.21,16],['市政',10.8,1.15,11]];
+var TARGET=10;
+function qColor(g,a){return g>=TARGET?(a>=1?C.green:C.blue):(a>=1?C.orange:C.red)}
+function drawScatter(){
+  var s=document.getElementById('scatter');s.innerHTML='';
+  var X0=64,X1=700,Y0=20,Y1=550,gMin=6,gMax=12.5,aMin=0.75,aMax=1.3;
+  function X(g){return X0+(g-gMin)/(gMax-gMin)*(X1-X0)}
+  function Y(a){return Y1-(a-aMin)/(aMax-aMin)*(Y1-Y0)}
+  var xm=X(TARGET),ym=Y(1);
+  [[X0,Y0,xm,ym,C.orange],[xm,Y0,X1,ym,C.green],[X0,ym,xm,Y1,C.red],[xm,ym,X1,Y1,C.blue]].forEach(function(q){el(s,'rect',{x:q[0],y:q[1],width:q[2]-q[0],height:q[3]-q[1],fill:q[4],opacity:.045})});
+  for(var g=6;g<=12;g++){el(s,'line',{x1:X(g),y1:Y0,x2:X(g),y2:Y1,stroke:C.grid});txt(s,X(g),Y1+20,g+'%',{anchor:'middle'})}
+  [0.8,0.9,1.0,1.1,1.2,1.3].forEach(function(a){el(s,'line',{x1:X0,y1:Y(a),x2:X1,y2:Y(a),stroke:C.grid});txt(s,X0-10,Y(a)+4,a.toFixed(1),{anchor:'end'})});
+  el(s,'line',{x1:xm,y1:Y0,x2:xm,y2:Y1,stroke:C.ref,'stroke-dasharray':'5 4'});
+  el(s,'line',{x1:X0,y1:ym,x2:X1,y2:ym,stroke:C.ref,'stroke-dasharray':'5 4'});
+  txt(s,xm+6,Y1-8,tr('目标毛利 10%'));txt(s,X1-6,ym-8,tr('活跃度 1.0'),{anchor:'end'});
+  txt(s,X0+12,Y0+22,tr('低效型'),{size:14,fill:C.orange,weight:700});
+  txt(s,X1-12,Y0+22,tr('健康型'),{size:14,fill:C.green,weight:700,anchor:'end'});
+  txt(s,X0+12,Y1-12,tr('高危型'),{size:14,fill:C.red,weight:700});
+  txt(s,X1-12,Y1-28,tr('垫资型'),{size:14,fill:C.blue,weight:700,anchor:'end'});
+  txt(s,X1,Y1+40,tr('动态毛利 →'),{anchor:'end'});txt(s,X0,Y0-6,tr('↑ 现金流活跃度'),{anchor:'start'});
+  PROJ.forEach(function(p){
+    var g=el(s,'g',{style:'cursor:pointer'});g.addEventListener('click',function(){PJ.forEach(function(x){if(x.s===p[0])openProj(x.n)})});
+    var col=qColor(p[1],p[2]);
+    el(g,'circle',{cx:X(p[1]),cy:Y(p[2]),r:p[3],fill:col,opacity:.88,stroke:'#fff','stroke-width':2});
+    txt(g,X(p[1]),Y(p[2])-p[3]-7,tr(p[0]),{size:13,fill:C.ink,weight:700,anchor:'middle'});
+  });
+}
+
+/* 三线图：13 个月（1 月—次年 1 月），实际至 10 月 */
+var MONTHS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月','1月'];
+function lineChart(id,o){
+  var s=document.getElementById(id);s.innerHTML='';
+  var X0=58,X1=622,Y0=14,Y1=226,n=MONTHS.length;
+  function X(i){return X0+i*(X1-X0)/(n-1)}
+  function Y(v){return Y1-(v-o.min)/(o.max-o.min)*(Y1-Y0)}
+  function pts(arr,off){return arr.map(function(v,i){return X(i+off)+','+Y(v)}).join(' ')}
+  var last=o.act.length-1;
+  el(s,'rect',{x:(X(last)+X(last+1))/2,y:Y0,width:X1+8-(X(last)+X(last+1))/2,height:Y1-Y0,fill:'#f4f6f9'});
+  txt(s,X1,Y0+14,tr('预测'),{anchor:'end'});
+  if(o.zone){el(s,'rect',{x:X0,y:Y(0),width:X1-X0,height:Y1-Y(0),fill:C.red,opacity:.04})}
+  o.ticks.forEach(function(v){el(s,'line',{x1:X0,y1:Y(v),x2:X1,y2:Y(v),stroke:v===0?'#cfd8e2':C.grid});txt(s,X0-10,Y(v)+4,o.tickFmt(v),{anchor:'end'})});
+  MONTHS.forEach(function(m,i){txt(s,X(i),Y1+22,tr(m),{anchor:'middle',fill:i===last?C.ink:C.muted,weight:i===last?700:400})});
+  (o.refs||[]).forEach(function(r){el(s,'line',{x1:X0,y1:Y(r.v),x2:X1,y2:Y(r.v),stroke:r.color,'stroke-dasharray':'5 4',opacity:.9});txt(s,X0+6,Y(r.v)-6,tr(r.label),{fill:r.color})});
+  if(o.plan){el(s,'polyline',{points:pts(o.plan,0),fill:'none',stroke:C.ref,'stroke-width':2,'stroke-dasharray':'5 4'})}
+  el(s,'polyline',{points:pts(o.act,0),fill:'none',stroke:o.color,'stroke-width':2.5,'stroke-linejoin':'round'});
+  var fc=[o.act[last]].concat(o.fc),fcol=o.sim?C.sim:o.color;
+  el(s,'polyline',{points:pts(fc,last),fill:'none',stroke:fcol,'stroke-width':2.5,'stroke-dasharray':'6 4'});
+  o.act.forEach(function(v,i){el(s,'circle',{cx:X(i),cy:Y(v),r:i===last?4.5:2.5,fill:i===last?o.color:'#fff',stroke:o.color,'stroke-width':1.5})});
+  o.fc.forEach(function(v,i){el(s,'circle',{cx:X(last+1+i),cy:Y(v),r:3,fill:'#fff',stroke:fcol,'stroke-width':1.5})});
+  txt(s,X(last),Y(o.act[last])+24,o.lastFmt(o.act[last]),{size:14,weight:700,fill:o.lastColor,anchor:'middle'});
+  var e=o.fc[o.fc.length-1];
+  if(o.endBelow){txt(s,X(n-1),Y(e)+22,o.lastFmt(e),{size:13,weight:700,fill:fcol,anchor:'end'})}
+  else{txt(s,X(n-1)-10,Y(e)+18,o.lastFmt(e),{size:13,weight:700,fill:fcol,anchor:'end'})}
+  (o.notes||[]).forEach(function(t){txt(s,X(t.i)+(t.dx||0),Y(t.v)+(t.dy||0),tr(t.text),{fill:t.color,anchor:t.anchor||'start'})});
+}
+var MG_ACT=[9.8,9.9,10.1,10.0,9.6,9.4,9.2,8.8,7.9,6.8];
+var CF_PLAN=[200,330,450,500,470,420,350,250,150,450,100,-500,-200];
+var CF_ACT=[200,330,450,500,380,120,-80,-180,-330,-980];
+function drawLines(m,c,chg){
+  lineChart('mgChart',{min:5.5,max:10.5,ticks:[6,7,8,9,10],tickFmt:function(v){return v+'%'},
+    refs:[{v:TARGET,label:'目标 10%',color:C.ref}],act:MG_ACT,fc:m,color:C.blue,sim:chg,endBelow:true,
+    lastFmt:function(v){return v.toFixed(1)+'%'},lastColor:C.orange,
+    notes:[{i:7,v:8.8,dx:-8,dy:26,text:'8 月起钢材超支显现',color:C.red,anchor:'end'}]});
+  lineChart('cfChart',{min:-2000,max:800,ticks:[-1500,-1000,-500,0,500],tickFmt:function(v){return v.toLocaleString('en-US')},zone:true,
+    refs:[{v:-500,label:'签约测算垫资峰值 -500',color:C.red}],plan:CF_PLAN,act:CF_ACT,fc:c,color:C.teal,sim:chg,endBelow:false,
+    lastFmt:function(v){return v.toLocaleString('en-US')},lastColor:C.red});
+  [].forEach.call(document.querySelectorAll('.fcK'),function(k){k.style.borderColor=chg?C.sim:''});
+}
+
+/* 建议模拟器 */
+var sim={a:false,b:false,c:false};
+function simTgl(k,inp){sim[k]=inp.checked;inp.closest('.simopt').classList.toggle('on',inp.checked);simRecalc()}
+/* 预测模型（11 月—次年 1 月）
+   毛利 = (收入合同 + 已批变更) − 预计总成本；成本只随已识别事项变动（钢材价差余 43 按剩余用量分摊）
+   当月净现金流 = Σ 预计回款 × 把握度系数 − Σ 预计付款（含已下达缓付的恢复支付）
+   把握度系数取该业主近 12 个月兑现率；超过合同付款期仍未确认的请款不计入，需催收措施才计入
+   措施只改具体的行：A 改收入、B 加一笔回款、C 把一笔付款挪月 */
+var COEF={'已确认':1,'节点已到':0.8,'节点未到':0.5};
+var FC0={rev:9320,cost:8690,cum:-980};
+var FC_M=['11月','12月','1月'];
+var FC_COST=[[['钢材价差余量传导',20]],[['钢材价差余量传导',15]],[['钢材价差余量传导',8]]];
+var FC_RCV=[
+  [['QS-2091 请款（业主已确认）','已确认',800],['10 月进度款（计量节点已到）','节点已到',700]],
+  [['11 月进度款','节点未到',450]],
+  [['12 月进度款','节点未到',380]]];
+var FC_PAY=[
+  [['劳务',320],['材料',460],['租赁',200],['10-19 缓付恢复（混凝土 100 · 钢结构 100 · 景观 150）',350]],
+  [['农民工工资（刚性）',260],['材料结算',250,'c'],['租赁',150]],
+  [['劳务（刚性）',260],['材料',340]]];
+function forecast(s){
+  var out=[],rev=FC0.rev,cost=FC0.cost,cum=FC0.cum;
+  for(var i=0;i<3;i++){
+    var o={revL:[],costL:[],rcvL:[],payL:[]};
+    if(s.a&&i===0){rev+=180;o.revL.push(['变更签证 180 获批（A）',180,true])}
+    FC_COST[i].forEach(function(x){cost+=x[1];o.costL.push([x[0],x[1]])});
+    var rl=FC_RCV[i].slice();if(s.b&&i===0){rl.push(['逾期请款 350 催回并确认（B）','已确认',350,true])}
+    var r=0;rl.forEach(function(x){var v=Math.round(x[2]*COEF[x[1]]);r+=v;o.rcvL.push([x[0],x[1],x[2],v,x[3]])});
+    var pl=FC_PAY[i].filter(function(x){return !(s.c&&x[2]==='c')}).map(function(x){return [x[0],x[1]]});
+    if(s.c&&i===2){pl.push(['12 月材料结算延至本月（C）',250,true])}
+    var p=0;pl.forEach(function(x){p+=x[1];o.payL.push(x)});
+    if(s.c&&i===1){o.payL.push(['材料结算 250 延至 1 月（C）',0,true])}
+    o.rev=rev;o.cost=cost;o.gm=rev-cost;o.pct=(rev-cost)/rev*100;o.r=r;o.p=p;o.n=r-p;cum+=o.n;o.cum=cum;
+    out.push(o);
+  }
+  return out;
+}
+function cl(label,v,hi,tot){return '<div class="cline'+(tot?' total':'')+(hi?' simv':'')+'"><span>'+label+'</span><b>'+v+'</b></div>'}
+function renderForecast(f){
+  var h='';
+  f.forEach(function(o,i){
+    var gv=sim.a?' simv':'',sv=(sim.b||sim.c)?' simv':'',k=function(v){return v.toLocaleString('en-US')};
+    h+='<tr class="fut" onclick="tglDet(this)"><td>'+tr(FC_M[i])+'<span class="crt">▾</span></td><td class="gm num'+gv+'">'+o.pct.toFixed(1)+'%</td><td class="gm num">—</td><td class="gc num'+sv+'">'+fmt(o.n)+'</td><td class="gc num">—</td><td class="gc num'+sv+(o.cum<-500?' neg':'')+'">'+k(o.cum)+'</td><td class="diag">'+tr('回款')+' '+k(o.r)+' − '+tr('付款')+' '+k(o.p)+(o.cum<-500?'；'+tr('超签约测算垫资峰值')+' -500':'')+'</td></tr>';
+    h+='<tr class="det"><td colspan="7"><div class="calc"><div class="cpane"><h5>'+tr('权责发生 · 毛利预测')+'</h5>';
+    o.revL.forEach(function(x){h+=cl(tr('收入')+' + '+tr(x[0]),'+'+x[1],x[2])});
+    h+=cl(tr('收入（合同 + 已批变更）'),k(o.rev));
+    o.costL.forEach(function(x){h+=cl(tr('成本')+' + '+tr(x[0]),'+'+x[1])});
+    h+=cl(tr('预计总成本'),k(o.cost));
+    h+=cl(tr('毛利')+' = '+k(o.rev)+' − '+k(o.cost),k(o.gm)+'（'+o.pct.toFixed(1)+'%）',false,true);
+    h+='</div><div class="cpane"><h5>'+tr('收付实现 · 现金流预测')+'</h5>';
+    o.rcvL.forEach(function(x){h+=cl(tr('回款')+'：'+tr(x[0])+' '+x[2]+' × '+COEF[x[1]].toFixed(1),k(x[3]),x[4])});
+    o.payL.forEach(function(x){h+=cl(tr('付款')+'：'+tr(x[0]),x[1]?k(x[1]):'—',x[2])});
+    h+=cl(tr('当月净')+' = '+k(o.r)+' − '+k(o.p)+' · '+tr('累计')+' '+k(o.cum),fmt(o.n),false,true);
+    h+='</div></div></td></tr>';
+  });
+  var tb=document.getElementById('fcDiv');
+  while(tb.nextElementSibling){tb.parentNode.removeChild(tb.nextElementSibling)}
+  tb.insertAdjacentHTML('afterend',h);
+}
+var FC_BASE=forecast({});
+function simRecalc(){
+  var chg=sim.a||sim.b||sim.c,f=forecast(sim);
+  renderForecast(f);
+  drawLines(f.map(function(o){return +o.pct.toFixed(1)}),f.map(function(o){return o.cum}),chg);
+  var b=FC_BASE[2],e=f[2],note=document.getElementById('simNote');note.classList.toggle('on',chg);
+  var jan=tr('1月');
+  if(!chg){note.textContent=tr('基准')+'：'+jan+' '+tr('累计净现金流')+' '+b.cum.toLocaleString('en-US')+' · '+tr('期末毛利')+' '+b.pct.toFixed(1)+'%'}
+  else{var ks=['a','b','c'].filter(function(k){return sim[k]}).map(function(k){return k.toUpperCase()}).join('+');
+    note.textContent=tr('模拟')+' '+ks+'：'+jan+' '+tr('累计净现金流')+' '+e.cum.toLocaleString('en-US')+'（'+tr('基准')+' '+b.cum.toLocaleString('en-US')+'） · '+tr('期末毛利')+' '+e.pct.toFixed(1)+'%（'+tr('基准')+' '+b.pct.toFixed(1)+'%）'}
+}
+
+/* 采纳建议 → 待办事项 */
+var SIM_TPL={
+  b:['R1',['催收逾期请款 350 万，11 月内业主确认回款','王五 · 商务','11-30 前']],
+  c:['R2',['12 月材料款 250 万延至 1 月支付','赵六 · 财务','12-10 前']]};
+var adopted={a:'T2'};
+function adoptSim(){
+  var ids=[];
+  ['a','b','c'].forEach(function(k){
+    if(!sim[k])return;
+    if(!adopted[k]){adopted[k]=addTask(SIM_TPL[k][0],'项目诊断',SIM_TPL[k][1])}
+    ids.push(adopted[k]);
+  });
+  nav('tasksView','文旅小镇二期',ids);
+}
+
+document.documentElement.style.setProperty('--hd',document.querySelector('header').offsetHeight+'px');
+document.documentElement.lang=LANG==='en'?'en':'zh-CN';
+drawScatter();
+simRecalc();
+renderAll();
+applyI18n(document.body);
+paintScanTime();
+syncLangBtns();
+</script>
+</body>
+</html>
